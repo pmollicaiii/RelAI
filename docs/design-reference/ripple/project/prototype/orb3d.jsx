@@ -2,9 +2,12 @@
 // Uses a raymarched 3D fbm in fragment shader for the water body,
 // and a Fresnel + refraction shader for the outer glass shell.
 
-(function(){
+(function () {
   const THREE = window.THREE;
-  if (!THREE) { console.error("[orb3d] Three.js not loaded"); return; }
+  if (!THREE) {
+    console.error("[orb3d] Three.js not loaded");
+    return;
+  }
 
   // =========================================================================
   // Shaders
@@ -14,7 +17,7 @@
   // Object-space ray-march. Sphere is at origin with radius 1 in object space.
   // The vertex shader provides both the entry point (vObjPos, on the sphere surface)
   // and the object-space view direction via uCamObj.
-  const waterVert = /* glsl */`
+  const waterVert = /* glsl */ `
     uniform vec3 uCamObj;           // camera position in object space
     varying vec3 vObjPos;           // object-space position (|vObjPos| == 1)
     varying vec3 vObjViewDir;       // object-space view direction
@@ -31,7 +34,7 @@
     }
   `;
 
-  const waterFrag = /* glsl */`
+  const waterFrag = /* glsl */ `
     precision highp float;
     uniform float uTime;
     uniform float uIntensity;
@@ -160,7 +163,7 @@
   `;
 
   // ---------- Glass shell (Fresnel + fake refraction) ----------
-  const glassVert = /* glsl */`
+  const glassVert = /* glsl */ `
     varying vec3 vNormalW;
     varying vec3 vViewDirW;
     varying vec2 vUv;
@@ -173,7 +176,7 @@
     }
   `;
 
-  const glassFrag = /* glsl */`
+  const glassFrag = /* glsl */ `
     precision highp float;
     uniform float uTime;
     uniform float uIntensity;
@@ -217,7 +220,9 @@
     const stateRef = React.useRef(null);
     const listeningRef = React.useRef(false);
 
-    React.useEffect(() => { listeningRef.current = !!listening; }, [listening]);
+    React.useEffect(() => {
+      listeningRef.current = !!listening;
+    }, [listening]);
 
     React.useEffect(() => {
       const mount = mountRef.current;
@@ -227,10 +232,15 @@
       const h = mount.clientHeight || 240;
 
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(32, w/h, 0.1, 50);
+      const camera = new THREE.PerspectiveCamera(32, w / h, 0.1, 50);
       camera.position.set(0, 0, 4.6);
 
-      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, premultipliedAlpha: true, preserveDrawingBuffer: true });
+      const renderer = new THREE.WebGLRenderer({
+        alpha: true,
+        antialias: true,
+        premultipliedAlpha: true,
+        preserveDrawingBuffer: true,
+      });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.setSize(w, h, false);
       renderer.setClearColor(0x000000, 0);
@@ -278,10 +288,10 @@
         uTime: { value: 0 },
         uIntensity: { value: 0 },
         uCamObj: { value: new THREE.Vector3() },
-        uDeep:   { value: new THREE.Color("#0a1f55") },
-        uMid:    { value: new THREE.Color("#2d7bde") },
+        uDeep: { value: new THREE.Color("#0a1f55") },
+        uMid: { value: new THREE.Color("#2d7bde") },
         uBright: { value: new THREE.Color("#7cc4ff") },
-        uRim:    { value: new THREE.Color("#a8dcff") },
+        uRim: { value: new THREE.Color("#a8dcff") },
       };
       const waterMat = new THREE.ShaderMaterial({
         vertexShader: waterVert,
@@ -368,16 +378,19 @@
       return () => {
         cancelAnimationFrame(raf);
         ro.disconnect();
-        waterGeo.dispose(); glassGeo.dispose(); backingGeo.dispose();
-        waterMat.dispose(); glassMat.dispose(); backingMat.dispose();
+        waterGeo.dispose();
+        glassGeo.dispose();
+        backingGeo.dispose();
+        waterMat.dispose();
+        glassMat.dispose();
+        backingMat.dispose();
         renderer.dispose();
-        if (renderer.domElement.parentNode) renderer.domElement.parentNode.removeChild(renderer.domElement);
+        if (renderer.domElement.parentNode)
+          renderer.domElement.parentNode.removeChild(renderer.domElement);
       };
     }, []);
 
-    return (
-      <div ref={mountRef} className="orb-3d-mount" />
-    );
+    return <div ref={mountRef} className="orb-3d-mount" />;
   }
 
   window.WaterOrb = WaterOrb;

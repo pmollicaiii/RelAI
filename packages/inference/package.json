@@ -1,0 +1,34 @@
+{
+  "name": "@relai/inference",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./router": "./src/router.ts",
+    "./types": "./src/types.ts",
+    "./cache": "./src/cache.ts",
+    "./retry": "./src/retry.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "eval": "echo \"No eval for inference\" && exit 0"
+  },
+  "dependencies": {
+    "@relai/db": "workspace:*",
+    "@relai/pii": "workspace:*",
+    "openai": "^4.77.0",
+    "@anthropic-ai/sdk": "^0.32.1",
+    "@google/genai": "^2.0.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8",
+    "@types/node": "^20"
+  }
+}

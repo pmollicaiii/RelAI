@@ -1,0 +1,32 @@
+{
+  "name": "@relai/rerank",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./centroid": "./src/centroid.ts",
+    "./judge": "./src/judge.ts",
+    "./types": "./src/types.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "test:watch": "vitest",
+    "eval": "echo \"No eval for rerank\" && exit 0"
+  },
+  "dependencies": {
+    "@relai/db": "workspace:*",
+    "@relai/embedding": "workspace:*",
+    "@relai/inference": "workspace:*",
+    "@relai/ontology": "workspace:*",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8",
+    "@types/node": "^20"
+  }
+}

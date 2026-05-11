@@ -16,7 +16,8 @@
       "build",
       "coverage",
       "eval/results",
-      "MLS Training Data",
+      "seed-data",
+      "docs/design-reference",
       "*.zip",
       "pnpm-lock.yaml"
     ]
@@ -34,16 +35,22 @@
       },
       "suspicious": {
         "noExplicitAny": "warn",
-        "noConsoleLog": "off"
+        "noConsoleLog": "off",
+        "noEmptyBlock": "warn"
       },
       "style": {
         "noNonNullAssertion": "warn",
         "useImportType": "error",
-        "useExportType": "error"
+        "useExportType": "error",
+        "useTemplate": "off",
+        "useSingleVarDeclarator": "off",
+        "noInferrableTypes": "off"
       },
       "complexity": {
         "noBannedTypes": "error",
-        "noUselessConstructor": "warn"
+        "noUselessConstructor": "warn",
+        "useLiteralKeys": "off",
+        "useArrowFunction": "off"
       }
     }
   },

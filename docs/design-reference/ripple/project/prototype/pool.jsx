@@ -23,32 +23,42 @@
 
 function Pool({ listening, submitting }) {
   const canvasRef = React.useRef(null);
-  const wrapRef   = React.useRef(null);
-  const listeningRef  = React.useRef(listening);
+  const wrapRef = React.useRef(null);
+  const listeningRef = React.useRef(listening);
   const submittingRef = React.useRef(submitting);
-  React.useEffect(() => { listeningRef.current = listening; }, [listening]);
-  React.useEffect(() => { submittingRef.current = submitting; }, [submitting]);
+  React.useEffect(() => {
+    listeningRef.current = listening;
+  }, [listening]);
+  React.useEffect(() => {
+    submittingRef.current = submitting;
+  }, [submitting]);
 
   React.useEffect(() => {
     const canvas = canvasRef.current;
-    const wrap   = wrapRef.current;
+    const wrap = wrapRef.current;
     if (!canvas || !wrap) return;
     const ctx = canvas.getContext("2d", { alpha: true });
 
     // ── Setup geometry & DPR ──────────────────────────────────────
     let dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
-    let W = 0, H = 0, cx = 0, cy = 0, poolR = 220, perspY = 0.55; // perspY < 1 = looking down at it
+    let W = 0,
+      H = 0,
+      cx = 0,
+      cy = 0,
+      poolR = 220,
+      perspY = 0.55; // perspY < 1 = looking down at it
     function resize() {
       const r = wrap.getBoundingClientRect();
-      W = r.width; H = r.height;
-      canvas.width  = Math.round(W * dpr);
+      W = r.width;
+      H = r.height;
+      canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
-      canvas.style.width  = W + "px";
+      canvas.style.width = W + "px";
       canvas.style.height = H + "px";
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       cx = W / 2;
-      cy = H / 2 + 6;          // pool center sits a hair below orb center
-      poolR = Math.min(W, H) * 0.46;   // pool radius
+      cy = H / 2 + 6; // pool center sits a hair below orb center
+      poolR = Math.min(W, H) * 0.46; // pool radius
     }
     resize();
     const ro = new ResizeObserver(resize);
@@ -59,15 +69,20 @@ function Pool({ listening, submitting }) {
     // every ~80ms while moving, scaled by speed. Hovering still emits at
     // a slow rate so the pool always responds to attention.
     let lastCursor = { x: 0, y: 0, t: 0, has: false };
-    let lastEmit   = 0;
+    let lastEmit = 0;
     function onMove(e) {
       const r = canvas.getBoundingClientRect();
-      const x = e.clientX - r.left, y = e.clientY - r.top;
-      const dx = x - cx, dy = (y - cy) / perspY;
-      const d  = Math.hypot(dx, dy);
-      if (d > poolR * 1.1) { lastCursor.has = false; return; }   // outside pool
+      const x = e.clientX - r.left,
+        y = e.clientY - r.top;
+      const dx = x - cx,
+        dy = (y - cy) / perspY;
+      const d = Math.hypot(dx, dy);
+      if (d > poolR * 1.1) {
+        lastCursor.has = false;
+        return;
+      } // outside pool
       const now = performance.now() / 1000;
-      const dt  = lastCursor.has ? Math.max(0.001, now - lastCursor.t) : 0.05;
+      const dt = lastCursor.has ? Math.max(0.001, now - lastCursor.t) : 0.05;
       const speed = lastCursor.has ? Math.hypot(x - lastCursor.x, y - lastCursor.y) / dt : 0;
       lastCursor = { x, y, t: now, has: true };
       // Emit a small packet at most every ~80ms, scaled by speed.
@@ -79,7 +94,9 @@ function Pool({ listening, submitting }) {
         }
       }
     }
-    function onLeave() { lastCursor.has = false; }
+    function onLeave() {
+      lastCursor.has = false;
+    }
     canvas.addEventListener("pointermove", onMove);
     canvas.addEventListener("pointerleave", onLeave);
 
@@ -119,19 +136,23 @@ function Pool({ listening, submitting }) {
       for (let i = 0; i < raw.length; i++) raw[i] = Math.random();
       const smooth = new Float32Array(raw.length);
       const N = NOISE_SIZE;
-      for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
-        let sum = 0, cnt = 0;
-        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
-          sum += raw[((y + dy + N) % N) * N + ((x + dx + N) % N)]; cnt++;
+      for (let y = 0; y < N; y++)
+        for (let x = 0; x < N; x++) {
+          let sum = 0,
+            cnt = 0;
+          for (let dy = -1; dy <= 1; dy++)
+            for (let dx = -1; dx <= 1; dx++) {
+              sum += raw[((y + dy + N) % N) * N + ((x + dx + N) % N)];
+              cnt++;
+            }
+          smooth[y * N + x] = sum / cnt;
         }
-        smooth[y * N + x] = sum / cnt;
-      }
       for (let i = 0; i < smooth.length; i++) {
         const v = Math.round(smooth[i] * 255);
-        nimg.data[i*4]   = v;
-        nimg.data[i*4+1] = v;
-        nimg.data[i*4+2] = v;
-        nimg.data[i*4+3] = 255;
+        nimg.data[i * 4] = v;
+        nimg.data[i * 4 + 1] = v;
+        nimg.data[i * 4 + 2] = v;
+        nimg.data[i * 4 + 3] = 255;
       }
       ncx.putImageData(nimg, 0, 0);
     }
@@ -141,21 +162,25 @@ function Pool({ listening, submitting }) {
       const mood = document.documentElement.getAttribute("data-mood") || "default";
       // Returns { base, crest, glow } in oklch-ish RGB tuples
       switch (mood) {
-        case "liminal":   return { base: [200,165,255], crest: [225,200,255], glow: [180,140,255] };
-        case "aurora":    return { base: [120,200,180], crest: [180,255,220], glow: [120,200,180] };
-        case "editorial": return { base: [120,160,230], crest: [200,220,255], glow: [120,160,230] };
-        default:          return { base: [167,139,250], crest: [220,200,255], glow: [167,139,250] };
+        case "liminal":
+          return { base: [200, 165, 255], crest: [225, 200, 255], glow: [180, 140, 255] };
+        case "aurora":
+          return { base: [120, 200, 180], crest: [180, 255, 220], glow: [120, 200, 180] };
+        case "editorial":
+          return { base: [120, 160, 230], crest: [200, 220, 255], glow: [120, 160, 230] };
+        default:
+          return { base: [167, 139, 250], crest: [220, 200, 255], glow: [167, 139, 250] };
       }
     }
 
     // ── Render loop ───────────────────────────────────────────────
     // Wave parameters (tuned for visual punch on a ~440px pool):
-    const v        = 220;     // wave speed (px/s)
-    const k        = 0.082;   // wave number (rad/px) — λ ≈ 76px
-    const sigma0   = 28;
+    const v = 220; // wave speed (px/s)
+    const k = 0.082; // wave number (rad/px) — λ ≈ 76px
+    const sigma0 = 28;
     const sigmaGrow = 24;
-    const alpha    = 1.1;     // global decay
-    const POOL_PAD = 2;       // shrink mask a touch to avoid hard edge
+    const alpha = 1.1; // global decay
+    const POOL_PAD = 2; // shrink mask a touch to avoid hard edge
 
     let raf = 0;
     function frame(now) {
@@ -171,11 +196,13 @@ function Pool({ listening, submitting }) {
       ctx.translate(cx, cy);
       ctx.scale(1, perspY);
       const sheen = ctx.createRadialGradient(0, 0, 0, 0, 0, poolR);
-      sheen.addColorStop(0,   `rgba(${col.glow.join(",")},0.10)`);
+      sheen.addColorStop(0, `rgba(${col.glow.join(",")},0.10)`);
       sheen.addColorStop(0.6, `rgba(${col.glow.join(",")},0.04)`);
-      sheen.addColorStop(1,   "rgba(0,0,0,0)");
+      sheen.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = sheen;
-      ctx.beginPath(); ctx.arc(0, 0, poolR, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, 0, poolR, 0, Math.PI * 2);
+      ctx.fill();
       ctx.restore();
 
       // Prune packets
@@ -203,16 +230,18 @@ function Pool({ listening, submitting }) {
       const ambientCount = 4;
       const ambientPeriod = 6;
       for (let i = 0; i < ambientCount; i++) {
-        const phase = ((t / ambientPeriod) + i / ambientCount) % 1;
+        const phase = (t / ambientPeriod + i / ambientCount) % 1;
         const r = phase * poolR;
         if (r < 12) continue;
-        const fade = Math.min(1, phase / 0.12) * Math.min(1, (1 - phase) / 0.30);
+        const fade = Math.min(1, phase / 0.12) * Math.min(1, (1 - phase) / 0.3);
         const a = 0.22 * fade;
         ctx.lineWidth = 0.9;
         ctx.strokeStyle = `rgba(${col.crest.join(",")},${a.toFixed(3)})`;
-        ctx.shadowColor = `rgba(${col.glow.join(",")},${(a*0.9).toFixed(3)})`;
+        ctx.shadowColor = `rgba(${col.glow.join(",")},${(a * 0.9).toFixed(3)})`;
         ctx.shadowBlur = 10;
-        ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.stroke();
       }
       ctx.shadowBlur = 0;
       ctx.globalCompositeOperation = "source-over";
@@ -224,8 +253,8 @@ function Pool({ listening, submitting }) {
       // Center breath — a subtle radial pulse synced to the orb's bob.
       // The orb's bob phase (cos for top, sin for crossing) tells us when
       // to brighten the centre. Also gets a quick flash on every splash.
-      const bobPhase = (t / (5.2)) * Math.PI * 2;     // matches clock period at pace=1
-      const breath = 0.5 + 0.5 * Math.sin(bobPhase);  // 0..1
+      const bobPhase = (t / 5.2) * Math.PI * 2; // matches clock period at pace=1
+      const breath = 0.5 + 0.5 * Math.sin(bobPhase); // 0..1
       // splash flash — find youngest packet, use its age
       let flash = 0;
       for (const p of packets) {
@@ -234,13 +263,13 @@ function Pool({ listening, submitting }) {
           flash = Math.max(flash, (1 - tau / 0.6) * 0.8 * p.amp);
         }
       }
-      const centreA = 0.10 + 0.06 * breath + flash * 0.55;
+      const centreA = 0.1 + 0.06 * breath + flash * 0.55;
       const centre = ctx.createRadialGradient(0, 0, 0, 0, 0, poolR * 0.55);
-      centre.addColorStop(0,   `rgba(${col.crest.join(",")},${centreA.toFixed(3)})`);
-      centre.addColorStop(0.4, `rgba(${col.glow.join(",")},${(centreA*0.5).toFixed(3)})`);
-      centre.addColorStop(1,   "rgba(0,0,0,0)");
+      centre.addColorStop(0, `rgba(${col.crest.join(",")},${centreA.toFixed(3)})`);
+      centre.addColorStop(0.4, `rgba(${col.glow.join(",")},${(centreA * 0.5).toFixed(3)})`);
+      centre.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = centre;
-      ctx.fillRect(-poolR, -poolR, poolR*2, poolR*2);
+      ctx.fillRect(-poolR, -poolR, poolR * 2, poolR * 2);
 
       // Wave packets — each emits 3-5 luminous arcs.
       ctx.globalCompositeOperation = "screen";
@@ -255,8 +284,8 @@ function Pool({ listening, submitting }) {
         const px = p.x - cx;
         const py = (p.y - cy) / perspY;
 
-        const r0   = v * tau;
-        const sig  = sigma0 + sigmaGrow * tau;
+        const r0 = v * tau;
+        const sig = sigma0 + sigmaGrow * tau;
         const damp = Math.exp(-alpha * tau);
         const attack = 1 - Math.exp(-tau * 16);
         const ampScale = (p.kind === "cursor" ? 0.5 : 1.0) * (submittingRef.current ? 1.3 : 1.0);
@@ -272,20 +301,20 @@ function Pool({ listening, submitting }) {
         const nMax = Math.floor(rmax / lambda - r0 / lambda);
 
         for (let n = nMin; n <= nMax; n++) {
-          const dr = n * lambda;     // offset from peak radius
-          const r  = r0 + dr;
+          const dr = n * lambda; // offset from peak radius
+          const r = r0 + dr;
           if (r < 6) continue;
           const env = Math.exp(-(dr * dr) / (sig * sig));
-          const intensity = A * env;     // 0..~1
+          const intensity = A * env; // 0..~1
           if (intensity < 0.02) continue;
 
           // Crest arc — width and glow scale with intensity
           const lineW = 0.6 + intensity * 2.4;
-          const a     = Math.min(0.85, intensity * 1.6);
+          const a = Math.min(0.85, intensity * 1.6);
           ctx.lineWidth = lineW;
           ctx.strokeStyle = `rgba(${col.crest.join(",")},${a.toFixed(3)})`;
-          ctx.shadowColor = `rgba(${col.glow.join(",")},${(a*0.9).toFixed(3)})`;
-          ctx.shadowBlur  = 12 + intensity * 14;
+          ctx.shadowColor = `rgba(${col.glow.join(",")},${(a * 0.9).toFixed(3)})`;
+          ctx.shadowBlur = 12 + intensity * 14;
           ctx.beginPath();
           ctx.arc(px, py, r, 0, Math.PI * 2);
           ctx.stroke();
@@ -312,7 +341,7 @@ function Pool({ listening, submitting }) {
 
   return (
     <div ref={wrapRef} className="pool-wrap" aria-hidden="true">
-      <canvas ref={canvasRef} className="pool-canvas"/>
+      <canvas ref={canvasRef} className="pool-canvas" />
     </div>
   );
 }
@@ -328,7 +357,7 @@ function drawCaustic(ctx, t, poolR, col, alpha, noiseCanvas) {
   ctx.filter = "blur(2px) contrast(1.6) brightness(1.05)";
   ctx.fillStyle = ctx.createPattern(noiseCanvas, "repeat");
   ctx.translate((t * 5) % N, (t * 3.5) % N);
-  ctx.fillRect(-poolR*1.3, -poolR*1.3, poolR*2.6, poolR*2.6);
+  ctx.fillRect(-poolR * 1.3, -poolR * 1.3, poolR * 2.6, poolR * 2.6);
   ctx.restore();
 
   // Layer 2 — counter-drift, finer flecks
@@ -338,7 +367,7 @@ function drawCaustic(ctx, t, poolR, col, alpha, noiseCanvas) {
   ctx.rotate(t * 0.04);
   ctx.translate(-(t * 2.5) % N, (t * 4) % N);
   ctx.fillStyle = ctx.createPattern(noiseCanvas, "repeat");
-  ctx.fillRect(-poolR*1.4, -poolR*1.4, poolR*2.8, poolR*2.8);
+  ctx.fillRect(-poolR * 1.4, -poolR * 1.4, poolR * 2.8, poolR * 2.8);
   ctx.restore();
 
   // Tint pass — multiply mood color over the luminance noise so flecks
@@ -346,10 +375,12 @@ function drawCaustic(ctx, t, poolR, col, alpha, noiseCanvas) {
   ctx.save();
   ctx.globalCompositeOperation = "multiply";
   const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, poolR);
-  grad.addColorStop(0,   `rgba(${col.glow.join(",")},0.7)`);
-  grad.addColorStop(1,   `rgba(${col.glow.join(",")},0.35)`);
+  grad.addColorStop(0, `rgba(${col.glow.join(",")},0.7)`);
+  grad.addColorStop(1, `rgba(${col.glow.join(",")},0.35)`);
   ctx.fillStyle = grad;
-  ctx.beginPath(); ctx.arc(0, 0, poolR, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath();
+  ctx.arc(0, 0, poolR, 0, Math.PI * 2);
+  ctx.fill();
   ctx.restore();
 }
 

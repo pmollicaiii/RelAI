@@ -3,8 +3,17 @@
 function Sidebar({ currentFolderId, folders, onSelectFolder, onHome }) {
   return (
     <aside className="sidebar">
-      <button className="brand brand-logo" onClick={onHome} style={{ background: "none", border: "none", cursor: "pointer", width: "100%", padding: 0 }}>
-        <img src="prototype/relai-logo.png" alt="RelAI" className="brand-logo-img" style={{ width: "100px", height: "100px" }} />
+      <button
+        className="brand brand-logo"
+        onClick={onHome}
+        style={{ background: "none", border: "none", cursor: "pointer", width: "100%", padding: 0 }}
+      >
+        <img
+          src="prototype/relai-logo.png"
+          alt="RelAI"
+          className="brand-logo-img"
+          style={{ width: "100px", height: "100px" }}
+        />
       </button>
       <div className="nav">
         <div className="label">Workspace</div>
@@ -14,15 +23,22 @@ function Sidebar({ currentFolderId, folders, onSelectFolder, onHome }) {
           <span className="count">5</span>
         </button>
         <div className="label">Client Folders</div>
-        {folders.map((f) =>
-        <button key={f.id} className={"item " + (currentFolderId === f.id ? "active" : "")} onClick={() => onSelectFolder(f.id)}>
+        {folders.map((f) => (
+          <button
+            key={f.id}
+            className={"item " + (currentFolderId === f.id ? "active" : "")}
+            onClick={() => onSelectFolder(f.id)}
+          >
             <span className={"dot " + (f.pulse || "")}></span>
             <span className="name">{f.clientName.split(" & ")[0]}</span>
             <span className="count">{f.savedCount}</span>
           </button>
-        )}
+        ))}
         <button className="item" style={{ color: "var(--ink-3)", marginTop: 6 }}>
-          <span className="dot" style={{ background: "transparent", border: "1px dashed var(--ink-4)" }}></span>
+          <span
+            className="dot"
+            style={{ background: "transparent", border: "1px dashed var(--ink-4)" }}
+          ></span>
           <span className="name">+ New folder</span>
         </button>
       </div>
@@ -33,8 +49,8 @@ function Sidebar({ currentFolderId, folders, onSelectFolder, onHome }) {
           <div className="em">Keller Williams · Center City</div>
         </div>
       </div>
-    </aside>);
-
+    </aside>
+  );
 }
 
 // ─────────────────────────────────────────────
@@ -58,47 +74,65 @@ function Sidebar({ currentFolderId, folders, onSelectFolder, onHome }) {
 //
 // (the damped-Gaussian × circular-wave equation), so each impact produces
 // a real propagating wave train, not just a single bump.
-window.__rippleClock = window.__rippleClock || (() => {
-  const subs = new Set();
-  const start = performance.now();
-  let lastBob = 0;
-  // Each splash: { t0: seconds, amp: 0.6..2 } — old ones are pruned to keep cost low.
-  const splashes = [];
-  const MAX_SPLASHES = 8;
-  function emitSplash(t, amp) {
-    splashes.push({ t0: t, amp });
-    if (splashes.length > MAX_SPLASHES) splashes.shift();
-  }
-  function pruneSplashes(t) {
-    // Anything older than 4 s has decayed below visibility; drop it.
-    while (splashes.length && t - splashes[0].t0 > 4) splashes.shift();
-  }
-  function getState(now) {
-    const t = (now - start) / 1000;
-    const pace = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--pace") || "1") || 1;
-    const period = 3.6 * pace;
-    const phase = t / period * Math.PI * 2;
-    const bob = Math.sin(phase);
-    if (lastBob > 0 && bob <= 0) emitSplash(t, 1.0); // natural cycle splash
-    lastBob = bob;
-    pruneSplashes(t);
-    return { t, phase, bob, period, splashes, sinceSplash: splashes.length ? t - splashes[splashes.length - 1].t0 : 10 };
-  }
-  function tick(now) {
-    const s = getState(now);
-    subs.forEach((fn) => {try {fn(s);} catch (e) {}});
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-  return {
-    subscribe(fn) {subs.add(fn);return () => subs.delete(fn);},
-    // Force a splash NOW (for search-submit, etc). strength scales amplitude.
-    forceSplash(strength = 1) {
-      const t = (performance.now() - start) / 1000;
-      emitSplash(t, 1.6 * strength);
+window.__rippleClock =
+  window.__rippleClock ||
+  (() => {
+    const subs = new Set();
+    const start = performance.now();
+    let lastBob = 0;
+    // Each splash: { t0: seconds, amp: 0.6..2 } — old ones are pruned to keep cost low.
+    const splashes = [];
+    const MAX_SPLASHES = 8;
+    function emitSplash(t, amp) {
+      splashes.push({ t0: t, amp });
+      if (splashes.length > MAX_SPLASHES) splashes.shift();
     }
-  };
-})();
+    function pruneSplashes(t) {
+      // Anything older than 4 s has decayed below visibility; drop it.
+      while (splashes.length && t - splashes[0].t0 > 4) splashes.shift();
+    }
+    function getState(now) {
+      const t = (now - start) / 1000;
+      const pace =
+        parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--pace") || "1") ||
+        1;
+      const period = 3.6 * pace;
+      const phase = (t / period) * Math.PI * 2;
+      const bob = Math.sin(phase);
+      if (lastBob > 0 && bob <= 0) emitSplash(t, 1.0); // natural cycle splash
+      lastBob = bob;
+      pruneSplashes(t);
+      return {
+        t,
+        phase,
+        bob,
+        period,
+        splashes,
+        sinceSplash: splashes.length ? t - splashes[splashes.length - 1].t0 : 10,
+      };
+    }
+    function tick(now) {
+      const s = getState(now);
+      subs.forEach((fn) => {
+        try {
+          fn(s);
+        } catch (e) {}
+      });
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+    return {
+      subscribe(fn) {
+        subs.add(fn);
+        return () => subs.delete(fn);
+      },
+      // Force a splash NOW (for search-submit, etc). strength scales amplitude.
+      forceSplash(strength = 1) {
+        const t = (performance.now() - start) / 1000;
+        emitSplash(t, 1.6 * strength);
+      },
+    };
+  })();
 
 function WaterlineRipples({ listening, submitting }) {
   const leftBase = React.useRef(null);
@@ -111,8 +145,12 @@ function WaterlineRipples({ listening, submitting }) {
   const rightMotes = React.useRef(null);
   const listeningRef = React.useRef(listening);
   const submittingRef = React.useRef(submitting);
-  React.useEffect(() => {listeningRef.current = listening;}, [listening]);
-  React.useEffect(() => {submittingRef.current = submitting;}, [submitting]);
+  React.useEffect(() => {
+    listeningRef.current = listening;
+  }, [listening]);
+  React.useEffect(() => {
+    submittingRef.current = submitting;
+  }, [submitting]);
 
   React.useEffect(() => {
     // Geometry
@@ -132,9 +170,9 @@ function WaterlineRipples({ listening, submitting }) {
 
     // Ambient swell — barely-there motion when the pool is at rest
     const ambient = [
-    { amp: 0.55, k: 0.030, speed: 0.8, phase: 0.0 },
-    { amp: 0.30, k: 0.055, speed: 1.3, phase: 1.7 }];
-
+      { amp: 0.55, k: 0.03, speed: 0.8, phase: 0.0 },
+      { amp: 0.3, k: 0.055, speed: 1.3, phase: 1.7 },
+    ];
 
     // Floating motes — N specks drifting outward; each carries a position
     // (px from sphere) and a phase offset for its tiny y-bob.
@@ -144,7 +182,7 @@ function WaterlineRipples({ listening, submitting }) {
       vx: 14 + Math.random() * 18, // px/s outward drift
       phase: Math.random() * Math.PI * 2,
       size: 0.6 + Math.random() * 1.0,
-      life: 1 // 0..1; fades out at edges
+      life: 1, // 0..1; fades out at edges
     }));
     let lastT = -1;
 
@@ -220,7 +258,9 @@ function WaterlineRipples({ listening, submitting }) {
 
       let dSpec = "";
       for (let i = 1; i < samples.length - 1; i++) {
-        const a = samples[i - 1].y,b = samples[i].y,c = samples[i + 1].y;
+        const a = samples[i - 1].y,
+          b = samples[i].y,
+          c = samples[i + 1].y;
         // Crest = local minimum (since y is inverted: more negative = higher peak)
         if (b < a && b < c && b < -thresh) {
           const len = Math.min(6, Math.abs(b) * 0.6);
@@ -269,23 +309,78 @@ function WaterlineRipples({ listening, submitting }) {
   }, []);
 
   return (
-    <div className={"waterline-ripples " + (listening ? "is-listening" : "") + (submitting ? " is-submitting" : "")} aria-hidden="true">
+    <div
+      className={
+        "waterline-ripples " +
+        (listening ? "is-listening" : "") +
+        (submitting ? " is-submitting" : "")
+      }
+      aria-hidden="true"
+    >
       <svg className="wl wl-left" viewBox="0 0 480 80" preserveAspectRatio="none">
         <g transform="translate(480,0) scale(-1,1)">
-          <path ref={leftGlow} className="wl-glow" fill="none" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-          <path ref={leftBase} className="wl-base" fill="none" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-          <path ref={leftSpec} className="wl-spec" fill="none" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-          <path ref={leftMotes} className="wl-motes" fill="none" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+          <path
+            ref={leftGlow}
+            className="wl-glow"
+            fill="none"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+          />
+          <path
+            ref={leftBase}
+            className="wl-base"
+            fill="none"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+          />
+          <path
+            ref={leftSpec}
+            className="wl-spec"
+            fill="none"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+          />
+          <path
+            ref={leftMotes}
+            className="wl-motes"
+            fill="none"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+          />
         </g>
       </svg>
       <svg className="wl wl-right" viewBox="0 0 480 80" preserveAspectRatio="none">
-        <path ref={rightGlow} className="wl-glow" fill="none" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-        <path ref={rightBase} className="wl-base" fill="none" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-        <path ref={rightSpec} className="wl-spec" fill="none" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-        <path ref={rightMotes} className="wl-motes" fill="none" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+        <path
+          ref={rightGlow}
+          className="wl-glow"
+          fill="none"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+        />
+        <path
+          ref={rightBase}
+          className="wl-base"
+          fill="none"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+        />
+        <path
+          ref={rightSpec}
+          className="wl-spec"
+          fill="none"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+        />
+        <path
+          ref={rightMotes}
+          className="wl-motes"
+          fill="none"
+          strokeLinecap="round"
+          vectorEffect="non-scaling-stroke"
+        />
       </svg>
-    </div>);
-
+    </div>
+  );
 }
 
 // Drives a JS-controlled translateY on a ref'd element so it bobs in lockstep
@@ -293,7 +388,9 @@ function WaterlineRipples({ listening, submitting }) {
 function useOrbBob(listening) {
   const ref = React.useRef(null);
   const listeningRef = React.useRef(listening);
-  React.useEffect(() => {listeningRef.current = listening;}, [listening]);
+  React.useEffect(() => {
+    listeningRef.current = listening;
+  }, [listening]);
   React.useEffect(() => {
     let curAmp = 6;
     const unsub = window.__rippleClock.subscribe(({ bob, sinceSplash }) => {
@@ -304,7 +401,8 @@ function useOrbBob(listening) {
       const targetAmp = listeningRef.current ? 11 : 6;
       curAmp += (targetAmp - curAmp) * 0.08;
       const sink = listeningRef.current ? 4 : 0;
-      const recoil = Math.exp(-sinceSplash * 4) * Math.sin(sinceSplash * 22) * (listeningRef.current ? 3 : 1.4);
+      const recoil =
+        Math.exp(-sinceSplash * 4) * Math.sin(sinceSplash * 22) * (listeningRef.current ? 3 : 1.4);
       const y = -bob * curAmp + recoil + sink;
       el.style.transform = `translateY(${y.toFixed(2)}px)`;
     });
@@ -327,16 +425,14 @@ function HomePage({ folders, pulse, onSelectFolder, onStartSearch }) {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
     setAttachments((prev) => [
-    ...prev,
-    ...files.map((f) => ({
-      id: f.name + ":" + f.size + ":" + Math.random().toString(36).slice(2, 6),
-      name: f.name,
-      size: f.size,
-      kind: f.type.startsWith("audio/") ? "audio" :
-      f.type.startsWith("image/") ? "image" :
-      "doc"
-    }))]
-    );
+      ...prev,
+      ...files.map((f) => ({
+        id: f.name + ":" + f.size + ":" + Math.random().toString(36).slice(2, 6),
+        name: f.name,
+        size: f.size,
+        kind: f.type.startsWith("audio/") ? "audio" : f.type.startsWith("image/") ? "image" : "doc",
+      })),
+    ]);
     // reset so picking the same file twice still fires onChange
     e.target.value = "";
   }
@@ -356,7 +452,8 @@ function HomePage({ folders, pulse, onSelectFolder, onStartSearch }) {
   const dictationRef = React.useRef(null);
 
   // Simulated dictation phrases — typed into the textarea while holding
-  const DICTATION = "Couple with two kids relocating from Brooklyn, budget around one point one million, want a real yard, not a tiny patio, needs three bedrooms, loves pre-war, Fitler or Rittenhouse, no new construction please.";
+  const DICTATION =
+    "Couple with two kids relocating from Brooklyn, budget around one point one million, want a real yard, not a tiny patio, needs three bedrooms, loves pre-war, Fitler or Rittenhouse, no new construction please.";
 
   function startListening() {
     if (listeningRef.current) return;
@@ -391,8 +488,14 @@ function HomePage({ folders, pulse, onSelectFolder, onStartSearch }) {
     if (!listeningRef.current) return;
     listeningRef.current = false;
     setListening(false);
-    if (timerRef.current) {clearInterval(timerRef.current);timerRef.current = null;}
-    if (dictationRef.current) {clearInterval(dictationRef.current);dictationRef.current = null;}
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    if (dictationRef.current) {
+      clearInterval(dictationRef.current);
+      dictationRef.current = null;
+    }
     setElapsedMs(0);
     // Crystallization moment — seeds float from textarea up around the orb and settle into criteria
     setCrystallizing(true);
@@ -408,7 +511,9 @@ function HomePage({ folders, pulse, onSelectFolder, onStartSearch }) {
     function onKeyUp(e) {
       if (e.key === "Shift") stopListening();
     }
-    function onBlur() {stopListening();}
+    function onBlur() {
+      stopListening();
+    }
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("keyup", onKeyUp);
     window.addEventListener("blur", onBlur);
@@ -438,31 +543,49 @@ function HomePage({ folders, pulse, onSelectFolder, onStartSearch }) {
   }
 
   const sec = Math.floor(elapsedMs / 1000);
-  const tenths = Math.floor(elapsedMs % 1000 / 100);
+  const tenths = Math.floor((elapsedMs % 1000) / 100);
 
   return (
     <div className="content">
       <div className="page-head home-head">
         <div>
           <div className="eyebrow-row">
-            <span className="eyebrow-day mono" style={{ opacity: "1", fontSize: "20px" }}>MON · 04 · 20</span>
+            <span className="eyebrow-day mono" style={{ opacity: "1", fontSize: "20px" }}>
+              MON · 04 · 20
+            </span>
             <span className="eyebrow-rule"></span>
-            <span className="eyebrow-greet" style={{ fontSize: "25px" }}>Good morning, Jordan.</span>
+            <span className="eyebrow-greet" style={{ fontSize: "25px" }}>
+              Good morning, Jordan.
+            </span>
           </div>
-          <h1 className="home-h1">Where would you like to <em>begin?</em></h1>
-          <p className="home-sub">Speak or type a search in plain English. RelAI will re-rank results using a client folder's <em style={{ color: "var(--accent)" }}>Taste</em> profile.</p>
+          <h1 className="home-h1">
+            Where would you like to <em>begin?</em>
+          </h1>
+          <p className="home-sub">
+            Speak or type a search in plain English. RelAI will re-rank results using a client
+            folder's <em style={{ color: "var(--accent)" }}>Taste</em> profile.
+          </p>
         </div>
         <div className="constellation">
-          <div className="const-label mono" style={{ color: "rgb(0, 0, 0)", fontSize: "12px", height: "60px" }}>RECENT</div>
+          <div
+            className="const-label mono"
+            style={{ color: "rgb(0, 0, 0)", fontSize: "12px", height: "60px" }}
+          >
+            RECENT
+          </div>
           <button className="const-orb" title="3-bed Fitler Square under $900k · Sarah & Mike">
             <span className="const-orb-bubble"></span>
             <span className="const-orb-name">Sarah</span>
-            <span className="const-orb-meta mono" style={{ color: "rgb(0, 0, 0)" }}>3D AGO · 12</span>
+            <span className="const-orb-meta mono" style={{ color: "rgb(0, 0, 0)" }}>
+              3D AGO · 12
+            </span>
           </button>
           <button className="const-orb" title="South Philly trinity, ~$550k · David">
             <span className="const-orb-bubble"></span>
             <span className="const-orb-name">David</span>
-            <span className="const-orb-meta mono" style={{ color: "rgb(0, 0, 0)" }}>1W AGO · 7</span>
+            <span className="const-orb-meta mono" style={{ color: "rgb(0, 0, 0)" }}>
+              1W AGO · 7
+            </span>
           </button>
           <button className="const-orb pulsing" title="Loft, Northern Liberties · Linh — 2 new">
             <span className="const-orb-bubble"></span>
@@ -473,48 +596,85 @@ function HomePage({ folders, pulse, onSelectFolder, onStartSearch }) {
       </div>
 
       <div className="orb-wrap">
-        {submitting && <div className="screen-ripple" aria-hidden="true"><span /><span /><span /></div>}
-        {crystallizing &&
-        <div className="seeds" aria-hidden="true">
-            {["3 BD", "Fitler Square", "Rittenhouse", "≤ $1.1M", "real yard", "pre-war", "no new construction"].map((s, i) =>
-          <span key={s} className={"seed seed-" + i}>{s}</span>
-          )}
+        {submitting && (
+          <div className="screen-ripple" aria-hidden="true">
+            <span />
+            <span />
+            <span />
           </div>
-        }
-        <div className={"orb-stage " + (listening ? "orb-stage--listening " : "") + (submitting ? "orb-stage--diving" : "")}>
+        )}
+        {crystallizing && (
+          <div className="seeds" aria-hidden="true">
+            {[
+              "3 BD",
+              "Fitler Square",
+              "Rittenhouse",
+              "≤ $1.1M",
+              "real yard",
+              "pre-war",
+              "no new construction",
+            ].map((s, i) => (
+              <span key={s} className={"seed seed-" + i}>
+                {s}
+              </span>
+            ))}
+          </div>
+        )}
+        <div
+          className={
+            "orb-stage " +
+            (listening ? "orb-stage--listening " : "") +
+            (submitting ? "orb-stage--diving" : "")
+          }
+        >
           <WaterlineRipples listening={listening} submitting={submitting} />
 
           {/* The bobbing sphere itself — JS-driven translateY on the wrapper */}
           <div ref={orbBobRef} className="orb-bobber">
-          <button className={"orb " + (listening ? "orb--listening" : "")}
-            onMouseDown={startListening}
-            onMouseUp={stopListening}
-            onMouseLeave={stopListening}
-            onTouchStart={(e) => {e.preventDefault();startListening();}}
-            onTouchEnd={stopListening}
-            title="Hold to dictate">
-            
-            {/* Outer atmospheric glow */}
-            <span className="orb-glow"></span>
-            <span className="orb-glow orb-glow-2"></span>
+            <button
+              className={"orb " + (listening ? "orb--listening" : "")}
+              onMouseDown={startListening}
+              onMouseUp={stopListening}
+              onMouseLeave={stopListening}
+              onTouchStart={(e) => {
+                e.preventDefault();
+                startListening();
+              }}
+              onTouchEnd={stopListening}
+              title="Hold to dictate"
+            >
+              {/* Outer atmospheric glow */}
+              <span className="orb-glow"></span>
+              <span className="orb-glow orb-glow-2"></span>
 
-            {/* 3D glass sphere (Three.js) */}
-            <WaterOrb listening={listening} />
-          </button>
+              {/* 3D glass sphere (Three.js) */}
+              <WaterOrb listening={listening} />
+            </button>
           </div>
         </div>
 
         <div className="orb-caption">
-          {listening ?
-          <>
+          {listening ? (
+            <>
               <div className="orb-t serif">I'm listening…</div>
-              <div className="orb-s mono">● RECORDING · {sec}.{tenths}s</div>
-            </> :
-
-          <div className="orb-hints">
+              <div className="orb-s mono">
+                ● RECORDING · {sec}.{tenths}s
+              </div>
+            </>
+          ) : (
+            <div className="orb-hints">
               <div className="orb-hint">
                 <span className="hint-icon hint-cursor">
-                  <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="24"
+                    height="24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M4 3 L4 17 L8.2 13.5 L10.6 19 L13 18 L10.6 12.6 L16 12.3 Z" />
                   </svg>
                   <span className="click-ring"></span>
@@ -526,7 +686,16 @@ function HomePage({ folders, pulse, onSelectFolder, onStartSearch }) {
               <div className="orb-hint">
                 <span className="hint-icon hint-key">
                   <span className="key-cap">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="14"
+                      height="14"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M7 10 L12 5 L17 10" style={{ stroke: "rgb(0, 0, 0)" }} />
                       <path d="M9 10 L9 18 L15 18 L15 10" style={{ stroke: "rgb(7, 7, 7)" }} />
                     </svg>
@@ -535,11 +704,14 @@ function HomePage({ folders, pulse, onSelectFolder, onStartSearch }) {
                 <span className="hint-lbl">hold shift</span>
               </div>
             </div>
-          }
+          )}
         </div>
       </div>
 
-      <div className={"compose " + (listening ? "compose--listening" : "")} style={{ marginTop: 28, position: "relative" }}>
+      <div
+        className={"compose " + (listening ? "compose--listening" : "")}
+        style={{ marginTop: 28, position: "relative" }}
+      >
         <div className="lbl" style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span>DESCRIBE WHAT YOU'RE LOOKING FOR:</span>
           <span className="spacer" style={{ flex: 1 }}></span>
@@ -551,36 +723,54 @@ function HomePage({ folders, pulse, onSelectFolder, onStartSearch }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="e.g. 3-bed rowhome in Fitler Square under $900k, needs a garage and outdoor space…  —or hold Shift and speak"
-          onKeyDown={(e) => {if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) go();}} />
-        
-        {listening &&
-        <div className="dictation-overlay">
-            <div className="dict-mic"><div className="dict-mic-ring"></div>🎙</div>
-            <div className="dict-wave">
-              {[...Array(18)].map((_, i) => <span key={i} style={{ animationDelay: i * 0.07 + "s" }} />)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) go();
+          }}
+        />
+
+        {listening && (
+          <div className="dictation-overlay">
+            <div className="dict-mic">
+              <div className="dict-mic-ring"></div>🎙
             </div>
-            <div className="dict-time mono">{sec}.{tenths}s</div>
+            <div className="dict-wave">
+              {[...Array(18)].map((_, i) => (
+                <span key={i} style={{ animationDelay: i * 0.07 + "s" }} />
+              ))}
+            </div>
+            <div className="dict-time mono">
+              {sec}.{tenths}s
+            </div>
             <div className="dict-hint mono">TRANSCRIBING · HOLD SHIFT</div>
           </div>
-        }
-        {attachments.length > 0 &&
-        <div className="attach-strip">
+        )}
+        {attachments.length > 0 && (
+          <div className="attach-strip">
             {attachments.map((a) => {
-            const sizeKb = a.size > 1024 * 1024 ?
-            (a.size / (1024 * 1024)).toFixed(1) + " MB" :
-            Math.max(1, Math.round(a.size / 1024)) + " KB";
-            const glyph = a.kind === "audio" ? "♪" : a.kind === "image" ? "▣" : "⌹";
-            return (
-              <div key={a.id} className={"attach-chip attach-chip--" + a.kind}>
+              const sizeKb =
+                a.size > 1024 * 1024
+                  ? (a.size / (1024 * 1024)).toFixed(1) + " MB"
+                  : Math.max(1, Math.round(a.size / 1024)) + " KB";
+              const glyph = a.kind === "audio" ? "♪" : a.kind === "image" ? "▣" : "⌹";
+              return (
+                <div key={a.id} className={"attach-chip attach-chip--" + a.kind}>
                   <span className="attach-glyph">{glyph}</span>
-                  <span className="attach-name" title={a.name}>{a.name}</span>
+                  <span className="attach-name" title={a.name}>
+                    {a.name}
+                  </span>
                   <span className="attach-size mono">{sizeKb}</span>
-                  <button className="attach-x" onClick={() => removeAttachment(a.id)} aria-label={"Remove " + a.name}>×</button>
-                </div>);
-
-          })}
+                  <button
+                    className="attach-x"
+                    onClick={() => removeAttachment(a.id)}
+                    aria-label={"Remove " + a.name}
+                  >
+                    ×
+                  </button>
+                </div>
+              );
+            })}
           </div>
-        }
+        )}
         <div className="row">
           <input
             ref={fileInputRef}
@@ -588,49 +778,71 @@ function HomePage({ folders, pulse, onSelectFolder, onStartSearch }) {
             multiple
             accept="audio/*,.txt,.md,.pdf,.doc,.docx,.rtf,.png,.jpg,.jpeg,.heic"
             style={{ display: "none" }}
-            onChange={onPickFiles} />
+            onChange={onPickFiles}
+          />
 
           <button
             className="attach-btn"
             onClick={() => fileInputRef.current && fileInputRef.current.click()}
-            title="Attach audio or notes from this device">
-
+            title="Attach audio or notes from this device"
+          >
             <span className="attach-btn-glyph">+</span>
             <span>Attach</span>
             <span className="attach-btn-kinds mono">AUDIO · DOC</span>
           </button>
           <div style={{ position: "relative" }}>
-            <button className="folder-btn" onClick={() => setPickerOpen(!pickerOpen)} title={selected ? "Change folder" : "Add to client folder"}>
-              {selected ?
-              <>
+            <button
+              className="folder-btn"
+              onClick={() => setPickerOpen(!pickerOpen)}
+              title={selected ? "Change folder" : "Add to client folder"}
+            >
+              {selected ? (
+                <>
                   <span className="attach-btn-glyph">📁</span>
                   <span>{selected.clientName.split(" & ")[0]}</span>
-                </> :
-
-              <>
+                </>
+              ) : (
+                <>
                   <span className="attach-btn-glyph">+</span>
                   <span style={{ fontSize: 16, lineHeight: 1 }}>📁</span>
                 </>
-              }
+              )}
               <span className="folder-caret">▾</span>
             </button>
-            {pickerOpen &&
-            <div className="hide-reasons" style={{ position: "absolute", right: "auto", left: 0, top: "110%", minWidth: 260 }}>
+            {pickerOpen && (
+              <div
+                className="hide-reasons"
+                style={{ position: "absolute", right: "auto", left: 0, top: "110%", minWidth: 260 }}
+              >
                 <div className="q">File this search under…</div>
                 <div className="opts">
-                  {folders.map((f) =>
-                <button key={f.id} className="opt" onClick={() => {setTargetFolder(f.id);setPickerOpen(false);}}>
+                  {folders.map((f) => (
+                    <button
+                      key={f.id}
+                      className="opt"
+                      onClick={() => {
+                        setTargetFolder(f.id);
+                        setPickerOpen(false);
+                      }}
+                    >
                       <b style={{ fontWeight: 500 }}>{f.clientName}</b>
-                      <span style={{ color: "var(--ink-3)", fontSize: 10.5, marginLeft: 8 }}>· {f.tasteHeadline}</span>
+                      <span style={{ color: "var(--ink-3)", fontSize: 10.5, marginLeft: 8 }}>
+                        · {f.tasteHeadline}
+                      </span>
                     </button>
-                )}
-                  <button className="opt" onClick={() => {setPickerOpen(false);}}>
+                  ))}
+                  <button
+                    className="opt"
+                    onClick={() => {
+                      setPickerOpen(false);
+                    }}
+                  >
                     <span style={{ color: "var(--accent)" }}>+ New client folder…</span>
                   </button>
                 </div>
                 <div className="meta">RE-RANKING USES THE CHOSEN FOLDER'S TASTE VECTOR</div>
               </div>
-            }
+            )}
           </div>
           <span className="hint mono">⌘ + ENTER to search</span>
           <div className="spacer"></div>
@@ -639,10 +851,13 @@ function HomePage({ folders, pulse, onSelectFolder, onStartSearch }) {
             onMouseDown={startListening}
             onMouseUp={stopListening}
             onMouseLeave={stopListening}
-            onTouchStart={(e) => {e.preventDefault();startListening();}}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              startListening();
+            }}
             onTouchEnd={stopListening}
-            title="Hold to dictate (or hold Shift)">
-            
+            title="Hold to dictate (or hold Shift)"
+          >
             <span className="mic-dot"></span>
             <span>{listening ? "Listening…" : "Hold to talk"}</span>
             <span className="kbd">SHIFT</span>
@@ -666,13 +881,12 @@ function HomePage({ folders, pulse, onSelectFolder, onStartSearch }) {
               <div className="ev">{p.label}</div>
               <div className="time mono">{p.time}</div>
               <div className="open">Open →</div>
-            </div>);
-
+            </div>
+          );
         })}
       </div>
-
-    </div>);
-
+    </div>
+  );
 }
 
 window.Sidebar = Sidebar;

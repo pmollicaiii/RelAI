@@ -5,16 +5,15 @@
 // folder.jsx; this file plugs in next to it.
 
 const FT = (() => {
-
   function Tabs({ active, onChange, counts }) {
     const tabs = [
-      { id: "search",   label: "Search",   sub: "find listings" },
+      { id: "search", label: "Search", sub: "find listings" },
       { id: "outreach", label: "Outreach", sub: "packets · emails", count: counts.outreach },
-      { id: "profile",  label: "Profile",  sub: "what we know" },
+      { id: "profile", label: "Profile", sub: "what we know" },
     ];
     return (
       <div className="ft-tabs">
-        {tabs.map(t => (
+        {tabs.map((t) => (
           <button
             key={t.id}
             className={"ft-tab " + (active === t.id ? "active" : "")}
@@ -22,9 +21,7 @@ const FT = (() => {
           >
             <span className="ft-tab-label">{t.label}</span>
             <span className="ft-tab-sub">{t.sub}</span>
-            {t.count != null && t.count > 0 && (
-              <span className="ft-tab-count mono">{t.count}</span>
-            )}
+            {t.count != null && t.count > 0 && <span className="ft-tab-count mono">{t.count}</span>}
           </button>
         ))}
       </div>
@@ -34,26 +31,33 @@ const FT = (() => {
   // ─── Outreach tab ──────────────────────────────────────────────────
   function OutreachTab({ folder, artifacts, listings }) {
     const [filter, setFilter] = React.useState("all");
-    const filtered = artifacts.filter(a =>
-      filter === "all" ? true :
-      filter === "pdf" ? a.kind === "pdf" :
-      filter === "email" ? a.kind === "email" : true
+    const filtered = artifacts.filter((a) =>
+      filter === "all"
+        ? true
+        : filter === "pdf"
+          ? a.kind === "pdf"
+          : filter === "email"
+            ? a.kind === "email"
+            : true,
     );
 
     return (
       <div className="ft-outreach">
         <div className="ft-section-hdr">
           <div>
-            <div className="ft-section-title serif">Outreach for {folder.clientName.split(" ")[0]}.</div>
+            <div className="ft-section-title serif">
+              Outreach for {folder.clientName.split(" ")[0]}.
+            </div>
             <div className="ft-section-sub">
-              Packets RelAI generated, emails it drafted, and what {folder.clientName.split(" ")[0]} actually opened.
+              Packets RelAI generated, emails it drafted, and what {folder.clientName.split(" ")[0]}{" "}
+              actually opened.
             </div>
           </div>
           <div className="ft-segctl">
             {[
               ["all", "All", artifacts.length],
-              ["pdf", "Packets", artifacts.filter(a => a.kind === "pdf").length],
-              ["email", "Emails", artifacts.filter(a => a.kind === "email").length],
+              ["pdf", "Packets", artifacts.filter((a) => a.kind === "pdf").length],
+              ["email", "Emails", artifacts.filter((a) => a.kind === "email").length],
             ].map(([id, lbl, n]) => (
               <button key={id} className={filter === id ? "on" : ""} onClick={() => setFilter(id)}>
                 {lbl} <span className="mono ct">{n}</span>
@@ -63,11 +67,15 @@ const FT = (() => {
         </div>
 
         <div className="ft-artifact-grid">
-          {filtered.map(a => <ArtifactCard key={a.id} a={a} listings={listings}/>)}
+          {filtered.map((a) => (
+            <ArtifactCard key={a.id} a={a} listings={listings} />
+          ))}
           <div className="ft-artifact-new">
             <div className="ft-artifact-new-icon">＋</div>
             <div className="ft-artifact-new-l1 serif">New artifact</div>
-            <div className="ft-artifact-new-l2">Generate a packet or draft an email from any saved listings.</div>
+            <div className="ft-artifact-new-l2">
+              Generate a packet or draft an email from any saved listings.
+            </div>
             <div className="ft-artifact-new-actions">
               <button className="ghost">Draft email</button>
               <button className="primary">New packet →</button>
@@ -97,7 +105,10 @@ const FT = (() => {
               <div className="ft-artifact-mini-eyebrow mono">RELAI · COVER</div>
               <div className="ft-artifact-mini-hdr serif">For {a.title.split("—")[0].trim()}</div>
               <div className="ft-artifact-mini-lines">
-                <span className="l"></span><span className="m"></span><span className="l"></span><span className="s"></span>
+                <span className="l"></span>
+                <span className="m"></span>
+                <span className="l"></span>
+                <span className="s"></span>
               </div>
             </div>
             <div className="ft-artifact-mini">
@@ -119,10 +130,17 @@ const FT = (() => {
 
         {!isPdf && (
           <div className="ft-artifact-preview email">
-            <div className="ft-email-line"><b>Subject:</b> {a.title}</div>
-            <div className="ft-email-line"><b>To:</b> sarah.johnson@…</div>
+            <div className="ft-email-line">
+              <b>Subject:</b> {a.title}
+            </div>
+            <div className="ft-email-line">
+              <b>To:</b> sarah.johnson@…
+            </div>
             <div className="ft-email-body">
-              "Hi Sarah — two from this week I think you'll love. <span className="ft-hl">2412 Pine</span> hits everything: Fitler Square, garage, private patio. <span className="ft-hl">318 S 22nd</span> is older stock with a courtyard, and worth a look despite 27 days on market."
+              "Hi Sarah — two from this week I think you'll love.{" "}
+              <span className="ft-hl">2412 Pine</span> hits everything: Fitler Square, garage,
+              private patio. <span className="ft-hl">318 S 22nd</span> is older stock with a
+              courtyard, and worth a look despite 27 days on market."
             </div>
           </div>
         )}
@@ -130,12 +148,16 @@ const FT = (() => {
         <div className="ft-artifact-meta">
           {isPdf && (
             <>
-              <span className="ft-meta-item"><b>{a.pages}</b> pages</span>
+              <span className="ft-meta-item">
+                <b>{a.pages}</b> pages
+              </span>
               <span className="ft-meta-item">{a.sizeMb} MB</span>
             </>
           )}
           {!isPdf && (
-            <span className="ft-meta-item"><b>{a.sentenceCount}</b> sentences</span>
+            <span className="ft-meta-item">
+              <b>{a.sentenceCount}</b> sentences
+            </span>
           )}
           {a.openedByClient ? (
             <span className="ft-meta-open">
@@ -169,9 +191,7 @@ const FT = (() => {
             <div className="ft-profile-eyebrow mono">PROFILE · LIVE</div>
             <div className="ft-profile-name serif">{folder.clientName}</div>
             <div className="ft-profile-headline serif">{folder.tasteHeadline}</div>
-            <div className="ft-profile-notes">
-              {folder.notes}
-            </div>
+            <div className="ft-profile-notes">{folder.notes}</div>
             <div className="ft-profile-stats">
               <div className="ft-stat">
                 <div className="ft-stat-num mono">{folder.savedCount}</div>

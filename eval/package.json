@@ -1,0 +1,23 @@
+{
+  "name": "@relai/eval",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"No tests for eval scaffold\" && exit 0",
+    "eval": "tsx src/run.ts"
+  },
+  "dependencies": {
+    "@relai/inference": "workspace:*",
+    "@relai/intent": "workspace:*",
+    "@relai/ontology": "workspace:*",
+    "@relai/embedding": "workspace:*",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "@types/node": "^20"
+  }
+}
