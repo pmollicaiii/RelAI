@@ -1,0 +1,395 @@
+// Mock data for RelAI V1 prototype — Philadelphia MLS, inspired by the real CSV corpus
+
+window.RELAI_DATA = (function() {
+  const folders = [
+    {
+      id: "f_sarah",
+      clientName: "Sarah & Mike Johnson",
+      notes: "First-time buyers, pre-approved at $900k. Love pre-war charm + private outdoor. 2 cats, 1 dog.",
+      savedCount: 12,
+      favoriteCount: 4,
+      packets: 2,
+      lastActivity: "12m ago",
+      pulse: "hot",
+      pulseLabel: "3 new matches since yesterday",
+      tasteHeadline: "Turn-of-century row-home",
+      tasteBars: [
+        { k: "Pre-war stock", v: 0.88 },
+        { k: "Private outdoor", v: 0.82 },
+        { k: "Walkability", v: 0.74 },
+        { k: "Quiet street", v: 0.61 },
+        { k: "New construction", v: 0.18 },
+      ],
+      signals: { explicit: 2, agentTag: 3, pitched: 2, softPref: 8 },
+    },
+    {
+      id: "f_david",
+      clientName: "David Chen",
+      notes: "Downsizing from Main Line. Wants low-maintenance condo, walkable. 55+.",
+      savedCount: 7,
+      favoriteCount: 2,
+      packets: 1,
+      lastActivity: "1h",
+      pulse: "warm",
+      pulseLabel: "Price drop on 1926 Pine — below max",
+      tasteHeadline: "Elevator condo, skyline view",
+    },
+    {
+      id: "f_linh",
+      clientName: "Linh Tran",
+      notes: "Investment property search. Cap rate > 6%, rentable as-is.",
+      savedCount: 5,
+      favoriteCount: 1,
+      packets: 3,
+      lastActivity: "3h",
+      pulse: "warm",
+      pulseLabel: "Opened packet — viewed 4 of 6",
+      tasteHeadline: "Cash-flowing duplex",
+    },
+    {
+      id: "f_paterno",
+      clientName: "The Paternos",
+      notes: "Family of 5, relocating from NJ for schools. Need 4bd + yard + good public elementary.",
+      savedCount: 9,
+      favoriteCount: 3,
+      packets: 1,
+      lastActivity: "yesterday",
+      pulse: "dim",
+      pulseLabel: "2 favorites went pending — no fresh matches",
+      tasteHeadline: "Family colonial w/ yard",
+    },
+    {
+      id: "f_okonkwo",
+      clientName: "R. Okonkwo",
+      notes: "Just getting started. Still figuring out budget.",
+      savedCount: 0,
+      favoriteCount: 0,
+      packets: 0,
+      lastActivity: "11d",
+      pulse: "dim",
+      pulseLabel: "No activity in 11 days",
+      tasteHeadline: "Not enough signal yet",
+    },
+  ];
+
+  const listings = [
+    {
+      id: "L01",
+      address: "2412 Pine Street",
+      city: "Philadelphia", state: "PA", zip: "19103",
+      neighborhood: "Fitler Square",
+      price: 849000, beds: 3, baths: 2.5, sqft: 1980, yearBuilt: 1920, dom: 14,
+      propertyType: "townhouse", mode: "sale",
+      features: ["garage", "private patio", "fireplace", "hardwood floors", "roof deck", "central A/C"],
+      remarks: "Sunny Fitler Square row-home with a one-car garage, private rear patio, and a generous roof deck with skyline views. Original hardwoods throughout.",
+      photos: ["tan", "brick"],
+      match: 92, heuristic: 0.89, semantic: 0.95, semanticState: "applied",
+      priceScore: 0.94, locationScore: 1.0, bedsScore: 1.0, bathsScore: 0.9, featureScore: 0.88, preferenceBoost: 0.12,
+      whyHighlights: [["private back patio", "outdoor"], ["one-car garage", "garage"], ["sunny roof deck", "outdoor"]],
+      lat: 0.58, lng: 0.22, // normalized 0–1 for mock map
+    },
+    {
+      id: "L02",
+      address: "2124 Spruce Street",
+      city: "Philadelphia", state: "PA", zip: "19103",
+      neighborhood: "Rittenhouse",
+      price: 795000, beds: 3, baths: 2, sqft: 1810, yearBuilt: 1905, dom: 8,
+      propertyType: "townhouse", mode: "sale",
+      features: ["deeded parking", "walled garden", "bay window", "hardwood floors", "fireplace"],
+      remarks: "Classic Rittenhouse trinity. No garage, but deeded rear parking and a walled garden. Original bay window, working fireplace.",
+      photos: ["cream"],
+      match: 86, heuristic: 0.84, semantic: 0.92, semanticState: "applied",
+      priceScore: 1.0, locationScore: 1.0, bedsScore: 1.0, bathsScore: 0.72, featureScore: 0.6, preferenceBoost: 0.14,
+      whyHighlights: [["deeded rear parking", "garage"], ["walled garden", "outdoor"]],
+      stretch: "No garage. Worth asking if Sarah will flex on this.",
+      lat: 0.28, lng: 0.48,
+    },
+    {
+      id: "L03",
+      address: "318 S 22nd Street",
+      city: "Philadelphia", state: "PA", zip: "19103",
+      neighborhood: "Fitler Square",
+      price: 875000, beds: 3, baths: 2.5, sqft: 2060, yearBuilt: 1890, dom: 27,
+      propertyType: "townhouse", mode: "sale",
+      features: ["garage", "courtyard", "original moldings", "hardwood floors", "wine cellar"],
+      remarks: "Older stock, fully renovated. Attached garage, private courtyard, original crown moldings throughout.",
+      photos: ["brick"],
+      match: 81, heuristic: 0.79, semantic: 0.86, semanticState: "applied",
+      priceScore: 0.88, locationScore: 1.0, bedsScore: 1.0, bathsScore: 0.9, featureScore: 0.84, preferenceBoost: 0.1,
+      whyHighlights: [["attached garage", "garage"], ["private courtyard", "outdoor"]],
+      negotiable: "27 days on market — sellers probably flexible.",
+      lat: 0.60, lng: 0.38,
+    },
+    {
+      id: "L04",
+      address: "2517 Lombard Street",
+      city: "Philadelphia", state: "PA", zip: "19146",
+      neighborhood: "Graduate Hospital",
+      price: 899000, beds: 3, baths: 2.5, sqft: 2200, yearBuilt: 2018, dom: 3,
+      propertyType: "townhouse", mode: "sale",
+      features: ["attached garage", "roof deck", "smart thermostat", "open concept", "quartz counters"],
+      remarks: "Brand new construction, open concept, attached garage, roof deck. Smart home wiring throughout.",
+      photos: ["grey"],
+      match: 78, heuristic: 0.81, semantic: 0.68, semanticState: "applied",
+      priceScore: 0.74, locationScore: 0.78, bedsScore: 1.0, bathsScore: 0.9, featureScore: 0.92, preferenceBoost: -0.09,
+      whyHighlights: [["attached garage", "garage"], ["roof deck", "outdoor"]],
+      stretch: "Outside Fitler (Graduate Hospital). Brand-new — doesn't fit the pre-war character she's been favoriting.",
+      lat: 0.72, lng: 0.62,
+    },
+    {
+      id: "L05",
+      address: "1926 Pine Street, #3",
+      city: "Philadelphia", state: "PA", zip: "19103",
+      neighborhood: "Rittenhouse",
+      price: 729000, beds: 2, baths: 2, sqft: 1310, yearBuilt: 1898, dom: 41,
+      propertyType: "condo", mode: "sale",
+      features: ["exposed brick", "fireplace", "balcony", "elevator"],
+      remarks: "Loft-style condo in a converted 1898 warehouse. Exposed brick, working fireplace, small balcony.",
+      photos: ["brick"],
+      match: 71, heuristic: 0.72, semantic: 0.69, semanticState: "applied",
+      priceScore: 1.0, locationScore: 1.0, bedsScore: 0.55, bathsScore: 0.72, featureScore: 0.64, preferenceBoost: 0.06,
+      whyHighlights: [["small balcony", "outdoor"]],
+      stretch: "Only 2 bedrooms. But the pre-war character + Rittenhouse location are strong.",
+      lat: 0.32, lng: 0.58,
+    },
+    {
+      id: "L06",
+      address: "2048 Naudain Street",
+      city: "Philadelphia", state: "PA", zip: "19103",
+      neighborhood: "Fitler Square",
+      price: 925000, beds: 3, baths: 2, sqft: 2110, yearBuilt: 1910, dom: 22,
+      propertyType: "townhouse", mode: "sale",
+      features: ["no parking", "shared courtyard", "bay window"],
+      remarks: "Fitler Square rowhome on quiet block. Shared courtyard (no private yard). Street parking only.",
+      photos: ["cream"],
+      match: 68, heuristic: 0.64, semantic: 0.74, semanticState: "applied",
+      priceScore: 0.42, locationScore: 1.0, bedsScore: 1.0, bathsScore: 0.72, featureScore: 0.48, preferenceBoost: 0.08,
+      stretch: "Over budget by $25k; no parking; shared (not private) outdoor.",
+      lat: 0.55, lng: 0.28,
+    },
+    {
+      id: "L07",
+      address: "1814 Delancey Place",
+      city: "Philadelphia", state: "PA", zip: "19103",
+      neighborhood: "Rittenhouse",
+      price: 875000, beds: 3, baths: 2.5, sqft: 1920, yearBuilt: 1885, dom: 61,
+      propertyType: "townhouse", mode: "sale",
+      features: ["no outdoor space", "original details"],
+      remarks: "Historic Delancey Place townhouse. No outdoor space, no parking — but extraordinary original details.",
+      photos: ["brick"],
+      match: 62, heuristic: 0.66, semantic: 0.48, semanticState: "applied",
+      priceScore: 0.86, locationScore: 1.0, bedsScore: 1.0, bathsScore: 0.9, featureScore: 0.32, preferenceBoost: -0.04,
+      stretch: "No outdoor space at all, and 61 days on market suggests it's been hard to move.",
+      lat: 0.30, lng: 0.42,
+    },
+  ];
+
+  // Wire each listing to a real MLS photo from the imported asset pack.
+  // The mapping is intentional, not random — the brick L01/L05/L07 use
+  // brick-fronted exteriors, the cream L02/L06 use the cream townhouses,
+  // tan/grey use what's left.
+  const listingPhotoMap = {
+    L01: ["apps/desktop/src/assets/listings/house-01.jpg", "apps/desktop/src/assets/listings/interior-01.jpg", "apps/desktop/src/assets/listings/interior-02.jpg"],
+    L02: ["apps/desktop/src/assets/listings/townhouse-01.jpg", "apps/desktop/src/assets/listings/interior-03.jpg"],
+    L03: ["apps/desktop/src/assets/listings/house-02.jpg", "apps/desktop/src/assets/listings/interior-01.jpg"],
+    L04: ["apps/desktop/src/assets/listings/townhouse-02.jpg", "apps/desktop/src/assets/listings/interior-02.jpg"],
+    L05: ["apps/desktop/src/assets/listings/condo-01.jpg", "apps/desktop/src/assets/listings/interior-03.jpg"],
+    L06: ["apps/desktop/src/assets/listings/house-03.jpg", "apps/desktop/src/assets/listings/condo-02.jpg"],
+    L07: ["apps/desktop/src/assets/listings/townhouse-01.jpg", "apps/desktop/src/assets/listings/interior-01.jpg"],
+  };
+  for (const l of listings) l.photoUrls = listingPhotoMap[l.id] || [];
+
+  const pulse = [
+    { clientId: "f_sarah", tone: "hot", label: "3 new listings match \"Fitler 3bd under $900k\"", time: "12m" },
+    { clientId: "f_david", tone: "warm", label: "Price drop on 1926 Pine St — now below his max", time: "1h" },
+    { clientId: "f_linh", tone: "warm", label: "Opened the packet you sent · viewed 4 of 6 listings", time: "3h" },
+    { clientId: "f_paterno", tone: "dim", label: "2 favorites went pending — folder has no fresh matches", time: "yday" },
+    { clientId: "f_okonkwo", tone: "dim", label: "No activity · last search 11 days ago", time: "—" },
+  ];
+
+  const ambiguity = {
+    field: "outdoor",
+    question: "What counts as 'outdoor space' for Sarah?",
+    options: [
+      { id: "any", label: "Any: yard, patio, balcony, roof deck", picked: true },
+      { id: "ground", label: "Ground-level only", picked: false },
+      { id: "private", label: "Private yard required", picked: false },
+    ],
+  };
+
+  const extractedCriteria = {
+    confidence: 0.78,
+    hard: {
+      locations: ["Fitler Square", "Rittenhouse"],
+      priceMax: 900000,
+      bedsMin: 3,
+      bathsMin: 2,
+      requiresGarage: true,
+      transactionMode: "sale",
+    },
+    soft: {
+      preferences: ["outdoor space", "private patio", "pre-war character"],
+    },
+    ambiguities: ["outdoor — yard, balcony, or roof deck?"],
+  };
+
+  const preferenceLedger = [
+    { k: "Pre-war character", delta: "+0.12", dir: "up", src: "explicit · \"we love old homes\"", auth: 1 },
+    { k: "Private outdoor", delta: "+0.08", dir: "up", src: "agent-tag · 3x", auth: 2 },
+    { k: "New construction", delta: "−0.09", dir: "dn", src: "hide · 2517 Lombard", auth: 2 },
+    { k: "Below 1,500 SF", delta: "−0.06", dir: "dn", src: "hide · 2x", auth: 2 },
+    { k: "High HOA", delta: "−0.04", dir: "dn", src: "soft-pref · \"no condos\"", auth: 4 },
+  ];
+
+  // Smart Control — preference chip library, grouped into 8 categories
+  // mirroring the production schema. Each chip has a canonicalKey (used
+  // for de-dup) and a display label. The library on the right panel pulls
+  // from this list; clicking ^/V on a row adds it to the active board
+  // with that polarity.
+  const chipLibrary = [
+    // home_feel_character
+    { id: "lib_prewar",      key: "prewar_character",     label: "Pre-war character",   category: "home_feel_character", aliases: ["old home", "historic"] },
+    { id: "lib_modern",      key: "modern_minimal",       label: "Modern · minimal",    category: "home_feel_character" },
+    { id: "lib_industrial",  key: "industrial_loft",      label: "Industrial · loft",   category: "home_feel_character" },
+    { id: "lib_traditional", key: "traditional_classic",  label: "Traditional",         category: "home_feel_character" },
+    { id: "lib_quirky",      key: "quirky_unique",        label: "Quirky · unique",     category: "home_feel_character" },
+
+    // layout_rooms
+    { id: "lib_open",        key: "open_floor_plan",      label: "Open floor plan",     category: "layout_rooms" },
+    { id: "lib_office",      key: "home_office",          label: "Home office",         category: "layout_rooms" },
+    { id: "lib_separate",    key: "separated_rooms",      label: "Separated rooms",     category: "layout_rooms" },
+    { id: "lib_first_bed",   key: "first_floor_bedroom",  label: "First-floor bedroom", category: "layout_rooms" },
+
+    // kitchen_baths
+    { id: "lib_chef_kitchen",key: "chef_kitchen",         label: "Chef's kitchen",      category: "kitchen_baths" },
+    { id: "lib_double_oven", key: "double_oven",          label: "Double oven",         category: "kitchen_baths" },
+    { id: "lib_renovated",   key: "renovated_kitchen",    label: "Renovated kitchen",   category: "kitchen_baths" },
+    { id: "lib_double_van",  key: "double_vanity",        label: "Double vanity",       category: "kitchen_baths" },
+
+    // interior_features
+    { id: "lib_fireplace",   key: "fireplace",            label: "Fireplace",           category: "interior_features" },
+    { id: "lib_hardwood",    key: "hardwood_floors",      label: "Hardwood floors",     category: "interior_features" },
+    { id: "lib_high_ceil",   key: "high_ceilings",        label: "High ceilings",       category: "interior_features" },
+    { id: "lib_natural_lt",  key: "natural_light",        label: "Lots of natural light", category: "interior_features" },
+    { id: "lib_carpet",      key: "wall_to_wall_carpet",  label: "Wall-to-wall carpet", category: "interior_features" },
+
+    // outdoor_lot
+    { id: "lib_priv_yard",   key: "private_yard",         label: "Private yard",        category: "outdoor_lot" },
+    { id: "lib_patio",       key: "patio",                label: "Patio",               category: "outdoor_lot" },
+    { id: "lib_roof_deck",   key: "roof_deck",            label: "Roof deck",           category: "outdoor_lot" },
+    { id: "lib_pool",        key: "pool",                 label: "Pool",                category: "outdoor_lot" },
+    { id: "lib_garage",      key: "garage",               label: "Garage",              category: "outdoor_lot" },
+    { id: "lib_no_yard",     key: "no_yard_work",         label: "No yard maintenance", category: "outdoor_lot" },
+
+    // location_neighborhood
+    { id: "lib_walkable",    key: "walkable",             label: "Walkable",            category: "location_neighborhood" },
+    { id: "lib_quiet_st",    key: "quiet_street",         label: "Quiet street",        category: "location_neighborhood" },
+    { id: "lib_main_road",   key: "on_main_road",         label: "On a main road",      category: "location_neighborhood" },
+    { id: "lib_transit",     key: "near_transit",         label: "Near transit",        category: "location_neighborhood" },
+    { id: "lib_near_park",   key: "near_park",            label: "Near a park",         category: "location_neighborhood" },
+
+    // community_schools
+    { id: "lib_top_schools", key: "top_rated_schools",    label: "Top-rated schools",   category: "community_schools" },
+    { id: "lib_walk_school", key: "walk_to_school",       label: "Walk to school",      category: "community_schools" },
+    { id: "lib_55plus",      key: "55_plus_community",    label: "55+ community",       category: "community_schools" },
+
+    // ownership_cost
+    { id: "lib_low_hoa",     key: "low_hoa",              label: "Low HOA",             category: "ownership_cost" },
+    { id: "lib_no_hoa",      key: "no_hoa",               label: "No HOA",              category: "ownership_cost" },
+    { id: "lib_low_taxes",   key: "low_property_tax",     label: "Low property tax",    category: "ownership_cost" },
+    { id: "lib_move_in",     key: "move_in_ready",        label: "Move-in ready",       category: "ownership_cost" },
+    { id: "lib_fixer",       key: "fixer_upper",          label: "Fixer-upper",         category: "ownership_cost" },
+  ];
+
+  // Active chips on the Smart Control board (Sarah's folder).
+  // Polarity drives color: green = positive (rank up), red = avoidance (rank down).
+  // Source explains where this chip came from — explicit, agent-tag, hide-feedback,
+  // search-parse, etc. — so the agent can audit how a folder learned what it learned.
+  const activeChips = [
+    // positives
+    { id: "ch_1", key: "prewar_character", label: "Pre-war character", polarity: "positive", source: "explicit", weight: 0.88 },
+    { id: "ch_2", key: "private_yard",     label: "Private outdoor",   polarity: "positive", source: "agent-tag", weight: 0.82 },
+    { id: "ch_3", key: "garage",           label: "Garage",            polarity: "positive", source: "search-parse", weight: 0.78 },
+    { id: "ch_4", key: "fireplace",        label: "Fireplace",         polarity: "positive", source: "search-parse", weight: 0.66 },
+    { id: "ch_5", key: "walkable",         label: "Walkable",          polarity: "positive", source: "agent-tag", weight: 0.74 },
+    { id: "ch_6", key: "hardwood_floors",  label: "Hardwood floors",   polarity: "positive", source: "search-parse", weight: 0.71 },
+    { id: "ch_7", key: "quiet_street",     label: "Quiet street",      polarity: "positive", source: "soft-pref", weight: 0.61 },
+
+    // avoidances
+    { id: "ch_8", key: "modern_minimal",   label: "Modern · minimal",  polarity: "avoidance", source: "hide", weight: 0.72 },
+    { id: "ch_9", key: "on_main_road",     label: "On a main road",    polarity: "avoidance", source: "agent-tag", weight: 0.65 },
+    { id: "ch_10", key: "wall_to_wall_carpet", label: "Wall-to-wall carpet", polarity: "avoidance", source: "agent-tag", weight: 0.58 },
+  ];
+
+  const chipCategories = [
+    { key: "home_feel_character",  label: "Home feel & character" },
+    { key: "layout_rooms",         label: "Layout & rooms" },
+    { key: "kitchen_baths",        label: "Kitchen & baths" },
+    { key: "interior_features",    label: "Interior features" },
+    { key: "outdoor_lot",          label: "Outdoor & lot" },
+    { key: "location_neighborhood",label: "Location & neighborhood" },
+    { key: "community_schools",    label: "Community & schools" },
+    { key: "ownership_cost",       label: "Ownership & cost" },
+  ];
+
+  // Outreach tab — generated artifacts (PDFs / emails) the agent has built.
+  const artifacts = [
+    {
+      id: "a_1", kind: "pdf",
+      title: "Three Fitler Square rowhomes",
+      subtitle: "Cover · 5 listings · side-by-side",
+      status: "ready",
+      createdAt: "Today · 9:42 AM",
+      pages: 7, sizeMb: 1.8,
+      listingIds: ["L01","L02","L03","L05","L06"],
+      openedByClient: true,
+      viewedListings: 4,
+    },
+    {
+      id: "a_2", kind: "email",
+      title: "First look — 2412 Pine + 318 S 22nd",
+      subtitle: "Drafted · ready to send",
+      status: "ready",
+      createdAt: "Today · 9:48 AM",
+      sentenceCount: 4,
+      listingIds: ["L01","L03"],
+    },
+    {
+      id: "a_3", kind: "pdf",
+      title: "Weekend tour packet",
+      subtitle: "8 listings + walk routes",
+      status: "ready",
+      createdAt: "Yesterday · 4:12 PM",
+      pages: 11, sizeMb: 2.6,
+      listingIds: [],
+      openedByClient: true,
+      viewedListings: 8,
+      lastViewed: "Yesterday · 6:30 PM",
+    },
+    {
+      id: "a_4", kind: "pdf",
+      title: "First batch — Fitler & Rittenhouse",
+      subtitle: "6 listings · neighborhood overview",
+      status: "ready",
+      createdAt: "Mon Apr 14 · 11:20 AM",
+      pages: 9, sizeMb: 2.1,
+      listingIds: [],
+      openedByClient: true,
+      viewedListings: 6,
+    },
+  ];
+
+  // Profile tab — client-level history & long-form notes (drives the
+  // "what RelAI knows about Sarah" page).
+  const profileEvents = [
+    { ts: "Today · 9:42 AM",  kind: "packet",  text: "Generated 7-page packet (5 listings)." },
+    { ts: "Today · 9:36 AM",  kind: "search",  text: "Search · '3-bed Fitler under 900k, garage and outdoor' — 7 results." },
+    { ts: "Today · 9:30 AM",  kind: "chip",    text: "Added avoidance chip · 'Wall-to-wall carpet' (from hide on 2517 Lombard)." },
+    { ts: "Yday · 6:30 PM",   kind: "open",    text: "Sarah opened the packet · viewed 4 of 6 listings (Pine St twice)." },
+    { ts: "Yday · 4:12 PM",   kind: "packet",  text: "Sent weekend tour packet (8 listings)." },
+    { ts: "Yday · 2:18 PM",   kind: "favorite",text: "Marked 2412 Pine as favorite." },
+    { ts: "Mon Apr 14",       kind: "note",    text: "Discovery call: 'we love old homes with character.' Pre-approved $900k." },
+  ];
+
+  return { folders, listings, pulse, ambiguity, extractedCriteria, preferenceLedger, chipLibrary, activeChips, chipCategories, artifacts, profileEvents };
+})();

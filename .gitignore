@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+.next/
+.turbo/
+.vercel/
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Environment
+.env.local
+.env.*.local
+.env.development.local
+.env.production.local
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Coverage / test outputs
+coverage/
+.nyc_output/
+
+# Eval outputs (regenerable)
+eval/results/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Sentry
+.sentryclirc
+
+# Misc
+*.tmp

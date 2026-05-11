@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>RelAI — V1 Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="prototype/styles.css?v=21"/>
+<link rel="stylesheet" href="prototype/styles-v2.css?v=2"/>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+
+<script src="prototype/data.js"></script>
+<script type="text/babel" src="prototype/icons.jsx"></script>
+<script type="text/babel" src="prototype/orb3d.jsx"></script>
+<script type="text/babel" src="prototype/pool.jsx?v=3"></script>
+<script type="text/babel" src="prototype/sidebar.jsx"></script>
+<script type="text/babel" src="prototype/folder-tabs.jsx"></script>
+<script type="text/babel" src="prototype/smart-control.jsx"></script>
+<script type="text/babel" src="prototype/folder.jsx"></script>
+<script type="text/babel" src="prototype/tweaks-panel.jsx"></script>
+
+<script type="text/babel">
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "mood": "aurora",
+  "pace": 2,
+  "voice": "press",
+  "density": "compact"
+}/*EDITMODE-END*/;
+
+function applyTweaks(t) {
+  const root = document.documentElement;
+  // --- Mood: recasts palette + aurora vibe ---
+  const moods = {
+    editorial: {
+      "--bg": "#f6f5f1", "--bg-2": "#efece3",
+      "--ink": "#13120f", "--ink-2": "#3a3732", "--ink-3": "#6b675e", "--ink-4": "#a8a396",
+      "--line": "#e6e3db", "--line-2": "#d7d3c8", "--card": "#fffdf7",
+      "--accent": "#ff5b2e", "--accent-soft": "rgba(255, 91, 46, 0.1)",
+      "--aurora-a": "rgba(255,91,46,0.18)", "--aurora-b": "rgba(120,180,255,0.22)",
+      "--orb-tint": "0deg",
+    },
+    liminal: {
+      "--bg": "#0f1115", "--bg-2": "#171a21",
+      "--ink": "#f0eee7", "--ink-2": "#c9c5b9", "--ink-3": "#8e8a7e", "--ink-4": "#56534a",
+      "--line": "#262a33", "--line-2": "#343943", "--card": "#1a1d24",
+      "--accent": "#a78bfa", "--accent-soft": "rgba(167, 139, 250, 0.16)",
+      "--aurora-a": "rgba(167,139,250,0.32)", "--aurora-b": "rgba(72,202,228,0.24)",
+      "--orb-tint": "240deg",
+    },
+    aurora: {
+      "--bg": "#f1f4f9", "--bg-2": "#e3e9f1",
+      "--ink": "#0f1620", "--ink-2": "#2d3849", "--ink-3": "#5a6779", "--ink-4": "#9aa3b3",
+      "--line": "#dde2eb", "--line-2": "#cdd4e0", "--card": "#fbfcff",
+      "--accent": "#1e5fff", "--accent-soft": "rgba(30, 95, 255, 0.12)",
+      "--aurora-a": "rgba(30,95,255,0.24)", "--aurora-b": "rgba(255,182,72,0.22)",
+      "--orb-tint": "220deg",
+    }
+  };
+  const m = moods[t.mood] || moods.editorial;
+  Object.entries(m).forEach(([k,v]) => root.style.setProperty(k, v));
+  root.dataset.mood = t.mood;
+
+  // --- Pace: scales every animation duration (CSS multiplier) ---
+  // We use a CSS variable that selected animations divide by.
+  root.style.setProperty("--pace", String(1 / t.pace));
+
+  // --- Voice: switches input model class on body ---
+  document.body.dataset.voice = t.voice;
+
+  // --- Density: spacing rhythm ---
+  document.body.dataset.density = t.density;
+}
+
+function App() {
+  const data = window.RELAI_DATA;
+  const [folderId, setFolderId] = React.useState(() => localStorage.getItem("ripple_folder") || null);
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  React.useEffect(() => { applyTweaks(tweaks); }, [tweaks]);
+
+  React.useEffect(() => {
+    if (folderId) localStorage.setItem("ripple_folder", folderId);
+    else localStorage.removeItem("ripple_folder");
+  }, [folderId]);
+
+  const folder = folderId ? data.folders.find(f => f.id === folderId) : null;
+
+  return (
+    <div className="app">
+      <Sidebar
+        currentFolderId={folderId}
+        folders={data.folders}
+        onSelectFolder={setFolderId}
+        onHome={() => setFolderId(null)}
+      />
+      <main className="main">
+        {folder
+          ? <FolderPage folder={folder} data={data} onBack={() => setFolderId(null)}/>
+          : <HomePage folders={data.folders} pulse={data.pulse} onSelectFolder={setFolderId} onStartSearch={(fid)=>setFolderId(fid)}/>
+        }
+      </main>
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Mood"/>
+        <TweakRadio
+          label="Palette" value={tweaks.mood}
+          options={["editorial","liminal","aurora"]}
+          onChange={v => setTweak("mood", v)}/>
+        <div style={{fontSize:10.5, color:"rgba(41,38,27,.55)", marginTop:-2, lineHeight:1.45}}>
+          {tweaks.mood === "editorial" && "Warm bone paper · vermilion accent · the print-magazine voice."}
+          {tweaks.mood === "liminal" && "Late-night studio · violet glow · a hush across the workspace."}
+          {tweaks.mood === "aurora" && "Coastal fog · moss + amber · soft, daylit, optimistic."}
+        </div>
+
+        <TweakSection label="Pace"/>
+        <TweakSlider
+          label="Motion speed" value={tweaks.pace}
+          min={0.5} max={2} step={0.1} unit="×"
+          onChange={v => setTweak("pace", v)}/>
+        <div style={{fontSize:10.5, color:"rgba(41,38,27,.55)", marginTop:-2, lineHeight:1.45}}>
+          {tweaks.pace < 0.85 ? "Slower — meditative, considered." :
+           tweaks.pace > 1.25 ? "Faster — electric, eager." :
+           "Steady — the natural cadence."}
+        </div>
+
+        <TweakSection label="Voice"/>
+        <TweakRadio
+          label="Input model" value={tweaks.voice}
+          options={["press","always-on","whisper"]}
+          onChange={v => setTweak("voice", v)}/>
+        <div style={{fontSize:10.5, color:"rgba(41,38,27,.55)", marginTop:-2, lineHeight:1.45}}>
+          {tweaks.voice === "press" && "Hold to talk. Quiet at rest."}
+          {tweaks.voice === "always-on" && "Live waveform around the orb. Speak any time."}
+          {tweaks.voice === "whisper" && "Tiny, modest orb. Lean in to invoke it."}
+        </div>
+
+        <TweakSection label="Density"/>
+        <TweakRadio
+          label="Spacing" value={tweaks.density}
+          options={["compact","regular","airy"]}
+          onChange={v => setTweak("density", v)}/>
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

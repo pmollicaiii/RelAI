@@ -1,0 +1,987 @@
+<!DOCTYPE html><html lang="en"><head>
+
+
+<meta charset="UTF-8">
+<title>Ripple — Design Ideas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Instrument+Serif&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f5f1;
+    --ink: #13120f;
+    --ink-2: #4a4843;
+    --ink-3: #85817a;
+    --line: #e6e3db;
+    --line-2: #d7d3c8;
+    --card: #fffdf7;
+    --accent: #ff5b2e;
+    --accent-ink: #7a2812;
+    --moss: #4b6a3c;
+    --sky: #3b6b8a;
+    --rose: #c94c6b;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--ink); font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { padding: 64px 48px 120px; }
+  .page { max-width: 1400px; margin: 0 auto; }
+
+  .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-3); }
+  h1.title { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 84px; line-height: 0.96; letter-spacing: -0.02em; margin: 14px 0 18px; }
+  h1.title em { font-style: italic; color: var(--accent); }
+  .deck { max-width: 720px; color: var(--ink-2); font-size: 17px; line-height: 1.55; }
+  .deck b { color: var(--ink); font-weight: 600; }
+
+  .rule { height: 1px; background: var(--ink); margin: 56px 0 40px; opacity: 0.9; }
+
+  h2.section { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 44px; letter-spacing: -0.01em; margin: 0 0 8px; }
+  .section-sub { color: var(--ink-3); font-size: 14px; margin-bottom: 28px; }
+
+  /* Observations */
+  .obs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .obs {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 22px 24px;
+  }
+  .obs .num { font-family: 'JetBrains Mono', monospace; color: var(--ink-3); font-size: 11px; letter-spacing: 0.08em; }
+  .obs h3 { font-size: 15px; font-weight: 600; margin: 10px 0 6px; }
+  .obs p { font-size: 13.5px; color: var(--ink-2); line-height: 1.55; margin: 0; }
+  .obs .tag {
+    display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent-ink);
+    background: rgba(255,91,46,0.1); padding: 3px 8px; border-radius: 4px; margin-top: 12px;
+  }
+
+  /* Direction cards */
+  .direction {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 0;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+  .direction-head {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 32px 40px 28px;
+    border-bottom: 1px dashed var(--line-2);
+  }
+  .direction-head .label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+  .direction-head h3.dname { font-family: 'Instrument Serif', serif; font-size: 48px; font-weight: 400; letter-spacing: -0.015em; margin: 8px 0 0; line-height: 1; }
+  .direction-head h3.dname em { font-style: italic; color: var(--accent); }
+  .direction-head .summary { font-size: 15px; color: var(--ink-2); line-height: 1.55; }
+  .direction-head .summary b { color: var(--ink); font-weight: 600; }
+  .pros-cons { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+  .pill {
+    font-family: 'JetBrains Mono', monospace; font-size: 11px;
+    padding: 5px 10px; border-radius: 20px;
+    background: rgba(75,106,60,0.09); color: var(--moss);
+  }
+  .pill.watch { background: rgba(201,76,107,0.09); color: var(--rose); }
+
+  .mock-wrap {
+    padding: 28px;
+    background: repeating-linear-gradient(45deg, transparent 0 10px, rgba(0,0,0,0.015) 10px 11px);
+  }
+  .mock {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 0 var(--line-2), 0 20px 40px -20px rgba(0,0,0,0.15);
+    border: 1px solid var(--line-2);
+  }
+
+  /* Tiny elements shared across mocks */
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ==== MOCK A: Editorial (warm paper) ==== */
+  .mA { background: #faf8f2; color: #1a1814; font-size: 12px; }
+  .mA .topbar { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid #ece7d9; }
+  .mA .brand { display: flex; align-items: baseline; gap: 10px; }
+  .mA .brand .logo { width: 22px; height: 22px; border-radius: 50%; background: #ff5b2e; display: inline-block; }
+  .mA .brand .name { font-family: 'Instrument Serif', serif; font-size: 22px; letter-spacing: -0.01em; }
+  .mA .brand .sep { color: #b2ada0; }
+  .mA .brand .client { font-weight: 600; font-size: 13px; }
+  .mA .tabs { display: flex; gap: 20px; font-size: 11px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; color: #7a7568; }
+  .mA .tabs .active { color: #1a1814; border-bottom: 1px solid #1a1814; padding-bottom: 4px; }
+  .mA .hero { padding: 28px 24px 20px; border-bottom: 1px solid #ece7d9; }
+  .mA .prompt { font-family: 'Instrument Serif', serif; font-size: 30px; line-height: 1.15; letter-spacing: -0.01em; max-width: 720px; }
+  .mA .prompt .quote { color: #b2ada0; }
+  .mA .promptrow { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 14px; }
+  .mA .metaline { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #7a7568; letter-spacing: 0.06em; }
+  .mA .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+  .mA .chip { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: #fff; border: 1px solid #ddd5c2; color: #2a281f; }
+  .mA .chip.loc { background: #1a1814; color: #faf8f2; border-color: #1a1814; }
+  .mA .chip.soft { background: transparent; border-style: dashed; font-style: italic; color: #7a7568; }
+
+  .mA .results { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .mA .listing { padding: 20px 24px; border-bottom: 1px solid #ece7d9; border-right: 1px solid #ece7d9; position: relative; }
+  .mA .listing:nth-child(even) { border-right: none; }
+  .mA .listing .rank { font-family: 'Instrument Serif', serif; font-size: 42px; color: #ff5b2e; float: left; line-height: 1; margin-right: 14px; }
+  .mA .listing .price { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+  .mA .listing .addr { font-size: 12px; color: #4a4843; margin-top: 1px; }
+  .mA .listing .stats { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #7a7568; margin-top: 8px; letter-spacing: 0.02em; }
+  .mA .listing .why { margin-top: 10px; font-size: 12.5px; line-height: 1.5; color: #2a281f; font-style: italic; clear: both; }
+  .mA .listing .why .hl { background: rgba(255,91,46,0.12); color: #7a2812; font-style: normal; padding: 0 3px; }
+  .mA .listing .scorebar { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+  .mA .listing .scorebar .track { flex: 1; height: 2px; background: #ece7d9; position: relative; }
+  .mA .listing .scorebar .track > span { position: absolute; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: #ff5b2e; }
+  .mA .listing .scorebar .num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #1a1814; }
+
+  /* ==== MOCK B: Dense / Bloomberg ==== */
+  .mB { background: #0d0d0c; color: #e9e5da; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .mB .topbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid #26231c; background: #14130f; }
+  .mB .topbar .left { display: flex; align-items: center; gap: 16px; font-size: 11px; }
+  .mB .brand { color: #ff5b2e; font-weight: 700; letter-spacing: 0.1em; }
+  .mB .kvs { color: #8a8577; }
+  .mB .kvs b { color: #e9e5da; font-weight: 500; }
+  .mB .searchline { padding: 14px 16px; border-bottom: 1px solid #26231c; background: #111; display: flex; align-items: center; gap: 12px; }
+  .mB .searchline .prompt { flex: 1; color: #e9e5da; }
+  .mB .searchline .prompt .caret { display: inline-block; width: 7px; height: 13px; background: #ff5b2e; vertical-align: -2px; animation: blink 1s infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .mB .criteriabar { display: flex; gap: 10px; padding: 8px 16px; background: #14130f; border-bottom: 1px solid #26231c; font-size: 10.5px; flex-wrap: wrap; }
+  .mB .crit { padding: 3px 8px; border: 1px solid #3a362b; color: #c6c0ad; }
+  .mB .crit.on { border-color: #ff5b2e; color: #ff5b2e; }
+  .mB .table { font-size: 11px; }
+  .mB .th, .mB .tr { display: grid; grid-template-columns: 32px 1fr 74px 60px 60px 76px 140px 64px; gap: 0; padding: 8px 16px; border-bottom: 1px solid #1e1c16; align-items: center; }
+  .mB .th { color: #8a8577; text-transform: uppercase; letter-spacing: 0.08em; font-size: 9.5px; border-bottom: 1px solid #3a362b; }
+  .mB .tr:hover { background: #19181a; }
+  .mB .tr.sel { background: rgba(255,91,46,0.07); }
+  .mB .rk { color: #8a8577; }
+  .mB .addr { color: #e9e5da; }
+  .mB .addr b { color: #fff; font-weight: 600; }
+  .mB .px { text-align: right; color: #fff; }
+  .mB .meta { text-align: right; color: #c6c0ad; }
+  .mB .score { text-align: right; font-weight: 700; }
+  .mB .score.hi { color: #7fd27a; }
+  .mB .score.mid { color: #e6c76b; }
+  .mB .score.lo { color: #d47d6b; }
+  .mB .sparkline { display: flex; align-items: center; justify-content: flex-end; gap: 2px; }
+  .mB .sparkline .bar { width: 4px; background: #3a362b; }
+  .mB .sparkline .bar.on { background: #ff5b2e; }
+  .mB .tag { text-align: right; color: #7a7568; font-size: 10px; }
+  .mB .footer { display: flex; justify-content: space-between; padding: 8px 16px; border-top: 1px solid #26231c; background: #14130f; color: #8a8577; font-size: 10.5px; }
+  .mB .footer .keys span { color: #e9e5da; margin: 0 4px; }
+
+  /* ==== MOCK C: Split view (map + cards) ==== */
+  .mC { background: #fff; color: #14120e; font-size: 12px; display: grid; grid-template-columns: 420px 1fr; min-height: 560px; }
+  .mC .left { border-right: 1px solid #eee9de; display: flex; flex-direction: column; }
+  .mC .lhead { padding: 16px 20px; border-bottom: 1px solid #eee9de; }
+  .mC .lhead .client { font-size: 11px; color: #85817a; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+  .mC .lhead h4 { font-family: 'Instrument Serif', serif; font-size: 22px; margin: 4px 0 0; font-weight: 400; }
+  .mC .lhead .searchbox { margin-top: 12px; padding: 10px 12px; border: 1px solid #e1dccc; border-radius: 8px; background: #fbfaf5; font-size: 12px; color: #4a4843; }
+  .mC .lhead .searchbox b { color: #14120e; font-weight: 500; }
+  .mC .lchips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+  .mC .lchips .c { font-size: 10.5px; padding: 2px 8px; border-radius: 20px; background: #f3efe2; color: #2a281f; }
+  .mC .lchips .c.acc { background: #1a1814; color: #faf8f2; }
+  .mC .llist { flex: 1; overflow: hidden; }
+  .mC .lcard { padding: 14px 20px; border-bottom: 1px solid #f3efe2; display: flex; gap: 14px; cursor: pointer; }
+  .mC .lcard.active { background: #fbfaf5; box-shadow: inset 3px 0 0 #ff5b2e; }
+  .mC .lcard .thumb { width: 78px; height: 62px; border-radius: 6px; background: repeating-linear-gradient(135deg, #f0ebd9 0 6px, #ece6cf 6px 12px); flex-shrink: 0; position: relative; }
+  .mC .lcard .thumb .badge { position: absolute; top: 4px; left: 4px; font-size: 9px; background: rgba(0,0,0,0.75); color: #fff; padding: 1.5px 5px; border-radius: 3px; font-family: 'JetBrains Mono', monospace; }
+  .mC .lcard .body .px { font-weight: 700; font-size: 14px; }
+  .mC .lcard .body .px .match { margin-left: 8px; font-weight: 500; font-size: 10.5px; color: #4b6a3c; font-family: 'JetBrains Mono', monospace; }
+  .mC .lcard .body .addr { font-size: 11.5px; color: #4a4843; margin-top: 1px; }
+  .mC .lcard .body .stats { font-size: 10.5px; color: #85817a; margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+  .mC .lcard .body .why { font-size: 11px; color: #2a281f; margin-top: 5px; font-style: italic; }
+
+  .mC .map { position: relative; background: #f5f2e7; overflow: hidden; }
+  .mC .map .river { position: absolute; left: 0; right: 0; top: 45%; height: 60px; background: linear-gradient(180deg, transparent, #cfdde2 30% 70%, transparent); transform: rotate(-6deg); opacity: 0.8; }
+  .mC .map .grid-bg { position: absolute; inset: 0; background-image: linear-gradient(to right, rgba(20,18,14,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(20,18,14,0.04) 1px, transparent 1px); background-size: 40px 40px; }
+  .mC .map .road { position: absolute; background: #fff; height: 3px; box-shadow: 0 0 0 1px #e1dccc; }
+  .mC .map .pin { position: absolute; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #14120e; color: #fff; font-size: 11px; font-weight: 700; transform: translate(-50%, -100%); font-family: 'JetBrains Mono', monospace; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+  .mC .map .pin.hot { background: #ff5b2e; }
+  .mC .map .pin::after { content: ""; position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); border: 5px solid transparent; border-top-color: inherit; }
+  .mC .map .label { position: absolute; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #85817a; text-transform: uppercase; letter-spacing: 0.08em; }
+  .mC .map .cluster { position: absolute; width: 52px; height: 52px; border-radius: 50%; background: rgba(255,91,46,0.15); border: 2px solid #ff5b2e; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #7a2812; }
+  .mC .mtop { position: absolute; top: 14px; right: 14px; display: flex; gap: 6px; }
+  .mC .mtop .tk { background: #fff; border: 1px solid #e1dccc; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #4a4843; }
+  .mC .detail { position: absolute; bottom: 16px; left: 16px; right: 16px; background: #fff; border: 1px solid #e1dccc; border-radius: 10px; padding: 14px 18px; display: grid; grid-template-columns: 110px 1fr auto; gap: 14px; align-items: center; box-shadow: 0 10px 30px -10px rgba(0,0,0,0.2); }
+  .mC .detail .thumb { width: 110px; height: 80px; border-radius: 6px; background: repeating-linear-gradient(135deg, #e8e2cc 0 6px, #dcd5ba 6px 12px); }
+  .mC .detail h5 { margin: 0; font-size: 15px; font-weight: 700; }
+  .mC .detail .sub { font-size: 11.5px; color: #4a4843; margin-top: 2px; }
+  .mC .detail .match { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #4b6a3c; margin-top: 6px; }
+  .mC .detail .act { display: flex; gap: 6px; }
+  .mC .detail .act .b { padding: 7px 12px; border-radius: 6px; background: #14120e; color: #fff; font-size: 11.5px; font-weight: 500; }
+  .mC .detail .act .b.g { background: #fff; color: #14120e; border: 1px solid #e1dccc; }
+
+  /* ==== MOCK D: Conversational / taste profile ==== */
+  .mD { background: #101014; color: #e7e4de; font-size: 12.5px; font-family: 'Inter', sans-serif; display: grid; grid-template-columns: 1fr 340px; min-height: 580px; }
+  .mD .main { padding: 28px 32px; border-right: 1px solid #23232a; overflow: hidden; }
+  .mD .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .mD .brand .dot { width: 10px; height: 10px; border-radius: 50%; background: #ff5b2e; box-shadow: 0 0 16px rgba(255,91,46,0.6); }
+  .mD .brand .name { font-family: 'Instrument Serif', serif; font-size: 20px; }
+  .mD .brand .crumb { color: #7a7786; font-size: 12px; font-family: 'JetBrains Mono', monospace; margin-left: auto; letter-spacing: 0.06em; }
+  .mD .thread { display: flex; flex-direction: column; gap: 14px; max-width: 680px; }
+  .mD .bubble.u { align-self: flex-end; background: #1c1c24; padding: 10px 14px; border-radius: 14px 14px 2px 14px; font-size: 13px; max-width: 80%; line-height: 1.45; }
+  .mD .bubble.a { max-width: 92%; }
+  .mD .bubble.a .lead { font-family: 'Instrument Serif', serif; font-size: 20px; line-height: 1.35; letter-spacing: -0.005em; }
+  .mD .bubble.a .lead b { background: linear-gradient(transparent 60%, rgba(255,91,46,0.35) 60%); padding: 0 2px; }
+  .mD .rowcards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+  .mD .rc { background: #1c1c24; border: 1px solid #2a2a33; border-radius: 10px; padding: 12px; }
+  .mD .rc .tag { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; color: #ff5b2e; letter-spacing: 0.08em; text-transform: uppercase; }
+  .mD .rc .px { font-size: 15px; font-weight: 700; margin-top: 6px; }
+  .mD .rc .addr { font-size: 11px; color: #a3a0ad; margin-top: 2px; }
+  .mD .rc .note { font-size: 11px; color: #cdcad4; margin-top: 8px; line-height: 1.4; font-style: italic; }
+  .mD .rc .mini { margin-top: 8px; display: flex; gap: 3px; }
+  .mD .rc .mini span { flex: 1; height: 3px; background: #2a2a33; border-radius: 2px; }
+  .mD .rc .mini span.a { background: #ff5b2e; }
+  .mD .suggest { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .mD .suggest .s { background: #1c1c24; border: 1px solid #2a2a33; font-size: 11.5px; padding: 6px 12px; border-radius: 18px; color: #cdcad4; }
+  .mD .suggest .s em { font-style: normal; color: #ff5b2e; }
+  .mD .inputbar { margin-top: 24px; background: #1c1c24; border: 1px solid #2a2a33; border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 12px; max-width: 680px; }
+  .mD .inputbar .ph { flex: 1; color: #7a7786; font-size: 13px; }
+  .mD .inputbar .ph .caret { display: inline-block; width: 2px; height: 14px; background: #ff5b2e; vertical-align: -3px; animation: blink 1s infinite; }
+  .mD .inputbar .btn { background: #ff5b2e; color: #fff; padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; }
+
+  .mD .side { padding: 26px 24px; overflow: hidden; background: #0d0d11; }
+  .mD .side h6 { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #7a7786; margin: 0 0 14px; font-weight: 500; }
+  .mD .taste { border: 1px solid #23232a; border-radius: 12px; padding: 16px; }
+  .mD .taste .hdr { font-family: 'Instrument Serif', serif; font-size: 22px; }
+  .mD .taste .sub { color: #a3a0ad; font-size: 11.5px; margin-top: 4px; }
+  .mD .taste .barrow { display: flex; align-items: center; gap: 8px; margin-top: 12px; font-size: 11.5px; }
+  .mD .taste .barrow .lbl { width: 92px; color: #a3a0ad; }
+  .mD .taste .barrow .tk { flex: 1; height: 3px; background: #23232a; border-radius: 2px; position: relative; }
+  .mD .taste .barrow .tk > span { position: absolute; top: 0; height: 100%; border-radius: 2px; background: linear-gradient(90deg, #ff5b2e, #ffb28a); }
+  .mD .taste .barrow .val { width: 28px; text-align: right; color: #e7e4de; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; }
+  .mD .taste .signals { margin-top: 14px; padding-top: 14px; border-top: 1px dashed #23232a; font-size: 11px; color: #a3a0ad; line-height: 1.5; }
+  .mD .taste .signals b { color: #e7e4de; font-weight: 500; }
+  .mD .pill-row { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+  .mD .pill-row .p { font-size: 10.5px; padding: 3px 8px; border-radius: 12px; background: #1c1c24; color: #cdcad4; border: 1px solid #2a2a33; }
+  .mD .pill-row .p.hot { background: rgba(255,91,46,0.12); color: #ffb28a; border-color: rgba(255,91,46,0.3); }
+
+  .mD .learn { margin-top: 20px; border: 1px solid #23232a; border-radius: 12px; padding: 14px; }
+  .mD .learn .row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 11.5px; }
+  .mD .learn .row .k { color: #a3a0ad; }
+  .mD .learn .row .v { color: #e7e4de; font-family: 'JetBrains Mono', monospace; }
+  .mD .learn .row .v.up { color: #7fd27a; }
+  .mD .learn .row .v.dn { color: #d47d6b; }
+
+  /* ==== Ideas grid ==== */
+  .ideas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .idea { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 0; overflow: hidden; }
+  .idea-head { padding: 18px 22px 12px; display: flex; gap: 10px; align-items: baseline; }
+  .idea-head .n { font-family: 'JetBrains Mono', monospace; color: var(--ink-3); font-size: 11px; letter-spacing: 0.1em; }
+  .idea-head h4 { margin: 0; font-size: 16px; font-weight: 600; }
+  .idea-body { padding: 0 22px 20px; color: var(--ink-2); font-size: 13.5px; line-height: 1.55; }
+
+  .idea-demo { margin: 0 22px 22px; background: #fbfaf5; border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+
+  /* Idea demo: score explainer */
+  .explain-row { display: grid; grid-template-columns: 80px 1fr 44px; gap: 10px; align-items: center; font-size: 12px; padding: 5px 0; }
+  .explain-row .lbl { color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .explain-row .track { height: 4px; background: #ece7d9; border-radius: 3px; position: relative; }
+  .explain-row .track > .fill { height: 100%; border-radius: 3px; background: var(--ink); }
+  .explain-row .track > .fill.orange { background: var(--accent); }
+  .explain-row .track > .fill.moss { background: var(--moss); }
+  .explain-row .track > .fill.sky { background: var(--sky); }
+  .explain-row .val { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .explain-row.sum { border-top: 1px solid var(--line-2); padding-top: 10px; margin-top: 6px; font-weight: 600; color: var(--ink); }
+  .explain-row .track > .semantic-mark { position: absolute; top: -4px; width: 2px; height: 12px; background: var(--accent); }
+
+  /* Idea demo: criteria chip with diff */
+  .chips-demo { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chips-demo .c { font-size: 11.5px; padding: 4px 10px; border-radius: 20px; background: #fff; border: 1px solid var(--line-2); }
+  .chips-demo .c.extr { background: #14120e; color: #faf8f2; border-color: #14120e; }
+  .chips-demo .c.add { background: rgba(75,106,60,0.1); color: var(--moss); border-color: rgba(75,106,60,0.3); }
+  .chips-demo .c.remove { background: rgba(201,76,107,0.08); color: var(--rose); border-color: rgba(201,76,107,0.3); text-decoration: line-through; text-decoration-color: rgba(201,76,107,0.5); }
+  .chips-demo .c.edit { border-style: dashed; }
+  .chips-demo .c.ambig { background: rgba(230,170,60,0.1); color: #8a6210; border-color: rgba(230,170,60,0.35); }
+  .chips-demo .c.ambig::before { content: "?"; display: inline-block; margin-right: 4px; font-weight: 700; }
+
+  /* Idea demo: folder pulse */
+  .pulse-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid var(--line-2); font-size: 12.5px; }
+  .pulse-row:last-child { border: none; }
+  .pulse-row .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); }
+  .pulse-row .dot.hot { background: var(--accent); box-shadow: 0 0 0 3px rgba(255,91,46,0.15); }
+  .pulse-row .dot.warm { background: var(--moss); }
+  .pulse-row .client { font-weight: 600; width: 150px; }
+  .pulse-row .ev { flex: 1; color: var(--ink-2); }
+  .pulse-row .ev em { font-style: normal; color: var(--ink); font-weight: 500; }
+  .pulse-row .time { color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; }
+
+  /* Idea demo: packet preview */
+  .packet { display: grid; grid-template-columns: 130px 1fr; gap: 14px; }
+  .packet .page {
+    width: 130px; height: 168px; background: #fff; border: 1px solid var(--line-2); border-radius: 4px;
+    padding: 10px 8px; font-size: 6px; line-height: 1.25; color: var(--ink-2); position: relative; overflow: hidden;
+  }
+  .packet .page .hdr { font-family: 'Instrument Serif', serif; font-size: 9px; color: var(--ink); }
+  .packet .page .img { height: 58px; background: repeating-linear-gradient(135deg, #eae3cf 0 4px, #e0d8bd 4px 8px); border-radius: 2px; margin: 6px 0; }
+  .packet .page .lines span { display: block; height: 2px; background: #ece7d9; border-radius: 1px; margin: 2px 0; }
+  .packet .page .lines span.s { width: 60%; }
+  .packet .page .lines span.m { width: 80%; }
+  .packet .page .foot { position: absolute; bottom: 6px; left: 8px; right: 8px; font-size: 5.5px; color: var(--ink-3); border-top: 1px solid #ece7d9; padding-top: 3px; }
+  .packet .controls { font-size: 12px; }
+  .packet .controls h5 { margin: 0 0 6px; font-size: 14px; font-weight: 600; }
+  .packet .controls p { margin: 0 0 10px; color: var(--ink-2); line-height: 1.5; }
+  .packet .controls .opts { display: flex; flex-direction: column; gap: 4px; }
+  .packet .controls .opts .opt { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1px solid var(--line-2); border-radius: 6px; font-size: 11.5px; }
+  .packet .controls .opts .opt.on { background: var(--ink); color: #faf8f2; border-color: var(--ink); }
+  .packet .controls .opts .opt .ck { width: 12px; height: 12px; border-radius: 3px; background: #ece7d9; }
+  .packet .controls .opts .opt.on .ck { background: var(--accent); }
+
+  /* Idea demo: preference learning */
+  .prefbox { font-size: 12px; }
+  .prefbox .row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line-2); }
+  .prefbox .row:last-child { border: none; }
+  .prefbox .k { color: var(--ink); font-weight: 500; }
+  .prefbox .k em { font-style: normal; color: var(--ink-3); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; margin-left: 6px; }
+  .prefbox .v { display: flex; align-items: center; gap: 8px; }
+  .prefbox .v .dir { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 2px 7px; border-radius: 4px; }
+  .prefbox .v .dir.up { color: var(--moss); background: rgba(75,106,60,0.1); }
+  .prefbox .v .dir.dn { color: var(--rose); background: rgba(201,76,107,0.08); }
+  .prefbox .v .src { color: var(--ink-3); font-size: 10.5px; font-family: 'JetBrains Mono', monospace; }
+
+  /* Idea demo: ambiguity resolver */
+  .ambig-card { background: #fffaea; border: 1px solid #ead8a5; border-radius: 10px; padding: 14px 16px; font-size: 12.5px; }
+  .ambig-card .q { font-weight: 600; margin-bottom: 8px; }
+  .ambig-card .opts { display: flex; gap: 6px; flex-wrap: wrap; }
+  .ambig-card .opt { padding: 5px 12px; border-radius: 16px; background: #fff; border: 1px solid #ead8a5; font-size: 11.5px; }
+  .ambig-card .opt.pick { background: #14120e; color: #faf8f2; border-color: #14120e; }
+  .ambig-card .meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #8a6210; margin-top: 8px; letter-spacing: 0.04em; }
+
+  /* Direction picker bar at top */
+  .picker { display: flex; gap: 8px; margin: 30px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); }
+  .picker span { padding: 6px 12px; border: 1px solid var(--line-2); border-radius: 18px; background: var(--card); }
+  .picker span.on { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  .caveat {
+    margin: 64px 0 0; padding: 20px 24px;
+    background: #fffdf3; border: 1px dashed var(--line-2); border-radius: 12px;
+    font-size: 13px; color: var(--ink-2); line-height: 1.55;
+  }
+  .caveat b { color: var(--ink); }
+
+  .footnote { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--ink-3); letter-spacing: 0.04em; margin-top: 14px; }
+</style>
+</head>
+<body style="">
+<div class="page">
+
+  <div class="eyebrow">Design Review · Ripple MLS Search · April 2026</div>
+  <h1 class="title">Four ways to make <em style=""><span style="font-style: normal; color: rgb(0, 0, 0);">Rel</span><span style="color: rgb(42, 50, 217);">AI</span></em> feel less like a database,<br>and more like an assistant.</h1>
+  <p class="deck">
+    I read through the desktop app, domain schemas, and ranker. Here's what I found, followed by <b>four design directions</b> for the core search-and-packet flow — each answering a different question about who Ripple is for. Then a short list of <b>focused UX upgrades</b> that are useful in any direction.
+  </p>
+  <p class="footnote">Note: I didn't actually boot the stack (no Docker here) — this is grounded in code, not runtime. The mockups use placeholder data + a warm editorial palette; none of it binds you to a final visual language.</p>
+
+  <!-- ─────────────────────── OBSERVATIONS ─────────────────────── -->
+  <div class="rule"></div>
+  <h2 class="section">What the app already is</h2>
+  <p class="section-sub">Anchors worth designing around — and soft spots worth pulling on.</p>
+
+  <div class="obs-grid">
+    <div class="obs">
+      <div class="num">01 · SHAPE</div>
+      <h3>Client folders are the unit of work</h3>
+      <p>Everything hangs off one client at a time: the search, saves/favorites, extracted criteria, artifacts, and the forthcoming preference embedding. That's a strong organizing primitive most MLS tools don't have. Lean into it.</p>
+      <span class="tag">Anchor</span>
+    </div>
+    <div class="obs">
+      <div class="num">02 · INPUT</div>
+      <h3>Natural language → structured criteria</h3>
+      <p>Agents type a sentence; the backend extracts hard filters, soft preferences, ambiguities, and a confidence. The UI already exposes this — but it reads as a form, not as a conversation with a teammate.</p>
+      <span class="tag">Opportunity</span>
+    </div>
+    <div class="obs">
+      <div class="num">03 · RANKING</div>
+      <h3>Heuristic + semantic, with three states</h3>
+      <p>Each result has price/location/beds/baths/feature/preference sub-scores, plus a semantic state (<span class="mono">applied · no-match · unavailable</span>). That's rich explainability the current card barely uses.</p>
+      <span class="tag">Unexploited</span>
+    </div>
+    <div class="obs">
+      <div class="num">04 · OUTPUTS</div>
+      <h3>The real product is a PDF or email</h3>
+      <p>Search is a means; the artifact is the end. Today the flow is: select → click → wait → download. No preview, no framing, no "why these five for Sarah" narrative.</p>
+      <span class="tag">Under-designed</span>
+    </div>
+    <div class="obs">
+      <div class="num">05 · FEEDBACK</div>
+      <h3>save/favorite/hide already encode taste</h3>
+      <p>Three-way actions plus ranked results is a full feedback loop — it's how the folder embedding should get smarter over time. The UI doesn't surface that the system is learning.</p>
+      <span class="tag">Invisible</span>
+    </div>
+    <div class="obs">
+      <div class="num">06 · BRAND</div>
+      <h3>"Pulse" / "Ripple" signals motion</h3>
+      <p>The current UI is a standard shadcn dark template — competent but anonymous. The name suggests something more alive: signals propagating, things coming back. Room for a real voice.</p>
+      <span class="tag">Blank canvas</span>
+    </div>
+  </div>
+
+  <!-- ─────────────────────── DIRECTIONS ─────────────────────── -->
+  <div class="rule"></div>
+  <h2 class="section">Four directions</h2>
+  <p class="section-sub">Same app, four different positionings. Each mocks the core screen (one client folder, one search, ranked results). Pick the one that fits who you want Ripple to be for.</p>
+
+  <!-- ======= A. Editorial Assistant ======= -->
+  <div class="direction">
+    <div class="direction-head">
+      <div>
+        <div class="label">Direction A</div>
+        <h3 class="dname">The <em>Editorial</em> Assistant</h3>
+        <div class="picker">
+          <span class="on">Warm paper</span><span>Serif voice</span><span>Narrated</span><span>Calm density</span>
+        </div>
+      </div>
+      <div>
+        <p class="summary">
+          Ripple talks to you. Results read like a <b>memo from a research associate</b> — "here's what Sarah is looking for, here are the five I'd open with, and here's why." Warm paper palette, Instrument Serif for voice, JetBrains Mono for data. One-at-a-time presentation; depth over breadth.
+        </p>
+        <div class="pros-cons">
+          <span class="pill">Differentiating</span>
+          <span class="pill">Elevates the agent's judgment</span>
+          <span class="pill watch">Not ideal for 200-result sweeps</span>
+        </div>
+      </div>
+    </div>
+    <div class="mock-wrap">
+      <div class="mock mA">
+        <div class="topbar">
+          <div class="brand">
+            <span class="logo"></span>
+            <span class="name">Ripple</span>
+            <span class="sep">/</span>
+            <span class="client">Sarah &amp; Mike Johnson</span>
+          </div>
+          <div class="tabs"><span class="active">Search</span><span>Saved · 4</span><span>Packets · 2</span></div>
+        </div>
+        <div class="hero">
+          <div class="prompt"><span class="quote">“</span>Looking for a <b>3-bed house</b> in <b>Fitler Square or Rittenhouse</b>, under <b>$900k</b>, needs a <b>garage</b> and <b>outdoor space</b>.<span class="quote">”</span></div>
+          <div class="promptrow">
+            <div class="chips">
+              <span class="chip loc">Fitler Square</span>
+              <span class="chip loc">Rittenhouse</span>
+              <span class="chip">≤ $900k</span>
+              <span class="chip">3+ bd</span>
+              <span class="chip">Garage</span>
+              <span class="chip soft">“outdoor space”</span>
+            </div>
+            <div class="metaline">42 eligible · 6 hidden · semantic rerank 0.2</div>
+          </div>
+        </div>
+        <div class="results">
+          <div class="listing">
+            <span class="rank">01</span>
+            <div class="price">$849,000</div>
+            <div class="addr">2412 Pine Street, Philadelphia PA 19103</div>
+            <div class="stats">3 BD · 2.5 BA · 1,980 SF · BUILT 1920 · 14 DOM</div>
+            <div class="why">Fitler Square row-home with a <span class="hl">one-car garage</span> and a <span class="hl">private back patio</span>. Agent remarks describe a “sunny roof deck with skyline views.”</div>
+            <div class="scorebar"><span class="mono">MATCH</span><div class="track"><span style="left:92%"></span></div><span class="num">92</span></div>
+          </div>
+          <div class="listing">
+            <span class="rank">02</span>
+            <div class="price">$795,000</div>
+            <div class="addr">2124 Spruce Street, Philadelphia PA 19103</div>
+            <div class="stats">3 BD · 2 BA · 1,810 SF · BUILT 1905 · 8 DOM</div>
+            <div class="why">Classic Rittenhouse trinity. No garage, but deeded <span class="hl">rear parking spot</span> and a <span class="hl">walled garden</span> — worth asking how strict the garage requirement is.</div>
+            <div class="scorebar"><span class="mono">MATCH</span><div class="track"><span style="left:86%"></span></div><span class="num">86</span></div>
+          </div>
+          <div class="listing">
+            <span class="rank">03</span>
+            <div class="price">$875,000</div>
+            <div class="addr">318 S 22nd Street, Philadelphia PA 19103</div>
+            <div class="stats">3 BD · 2.5 BA · 2,060 SF · BUILT 1890 · 27 DOM</div>
+            <div class="why">Slightly older stock than the others. Garage, small <span class="hl">courtyard</span>. Price is borderline; 27 days on market suggests negotiation room.</div>
+            <div class="scorebar"><span class="mono">MATCH</span><div class="track"><span style="left:81%"></span></div><span class="num">81</span></div>
+          </div>
+          <div class="listing">
+            <span class="rank">04</span>
+            <div class="price">$899,000</div>
+            <div class="addr">2517 Lombard Street, Philadelphia PA 19146</div>
+            <div class="stats">3 BD · 2.5 BA · 2,200 SF · BUILT 2018 · 3 DOM</div>
+            <div class="why">Just outside Fitler but on the <span class="hl">border</span> — new construction, <span class="hl">attached garage</span>, roof deck. Brand new; little negotiation room.</div>
+            <div class="scorebar"><span class="mono">MATCH</span><div class="track"><span style="left:78%"></span></div><span class="num">78</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= B. Bloomberg / Dense Pro ======= -->
+  <div class="direction">
+    <div class="direction-head">
+      <div>
+        <div class="label">Direction B</div>
+        <h3 class="dname">The <em>Terminal</em></h3>
+        <div class="picker">
+          <span>Warm paper</span><span class="on">Dense mono</span><span class="on">Keyboard-first</span><span>Narrated</span>
+        </div>
+      </div>
+      <div>
+        <p class="summary">
+          For the high-volume agent who runs <b>10 searches before lunch</b>. Everything is a keyboard shortcut, everything is comparable at a glance, sub-score sparklines replace prose. Dark background, warm orange highlight — the feel of a Bloomberg terminal for real estate.
+        </p>
+        <div class="pros-cons">
+          <span class="pill">Power users love it</span>
+          <span class="pill">Comparisons are fast</span>
+          <span class="pill watch">Alienating to new agents</span>
+        </div>
+      </div>
+    </div>
+    <div class="mock-wrap">
+      <div class="mock mB">
+        <div class="topbar">
+          <div class="left">
+            <span class="brand">RIPPLE //</span>
+            <span class="kvs">CLIENT <b>SARAH &amp; MIKE JOHNSON</b></span>
+            <span class="kvs">SEARCH <b>#S-0042</b></span>
+            <span class="kvs">STATUS <b style="color:#7fd27a">LIVE</b></span>
+          </div>
+          <div class="kvs">42 RESULTS · 0.42s · SEM 0.2</div>
+        </div>
+        <div class="searchline">
+          <span style="color:#ff5b2e">&gt;</span>
+          <span class="prompt">3bd fitler/rittenhouse &lt;900k garage + outdoor<span class="caret"></span></span>
+          <span class="kvs">[⏎ RUN] [⌘K REFINE] [⌘S SAVE] [⌘P PACKET]</span>
+        </div>
+        <div class="criteriabar">
+          <span class="crit on">LOC:fitler,rittenhouse</span>
+          <span class="crit on">PX≤900000</span>
+          <span class="crit on">BD≥3</span>
+          <span class="crit on">GARAGE</span>
+          <span class="crit">BA≥?</span>
+          <span class="crit">YEAR?</span>
+          <span class="crit on" style="color:#e6c76b">SOFT:"outdoor"</span>
+        </div>
+        <div class="table">
+          <div class="th"><span>#</span><span>ADDR</span><span>PX</span><span>BD/BA</span><span>SF</span><span>DOM</span><span>PX·LOC·B·F·S</span><span>MATCH</span></div>
+          <div class="tr sel">
+            <span class="rk">01</span>
+            <span class="addr"><b>2412 Pine St</b> · Fitler Sq · 19103</span>
+            <span class="px">849,000</span><span class="meta">3/2.5</span><span class="meta">1,980</span><span class="meta">14d</span>
+            <span class="sparkline"><span class="bar on" style="height:8px"></span><span class="bar on" style="height:12px"></span><span class="bar on" style="height:10px"></span><span class="bar on" style="height:11px"></span><span class="bar on" style="height:9px"></span></span>
+            <span class="score hi">92</span>
+          </div>
+          <div class="tr">
+            <span class="rk">02</span>
+            <span class="addr"><b>2124 Spruce St</b> · Rittenhouse · 19103</span>
+            <span class="px">795,000</span><span class="meta">3/2</span><span class="meta">1,810</span><span class="meta">8d</span>
+            <span class="sparkline"><span class="bar on" style="height:10px"></span><span class="bar on" style="height:11px"></span><span class="bar on" style="height:9px"></span><span class="bar" style="height:4px"></span><span class="bar on" style="height:10px"></span></span>
+            <span class="score hi">86</span>
+          </div>
+          <div class="tr">
+            <span class="rk">03</span>
+            <span class="addr"><b>318 S 22nd St</b> · Fitler Sq · 19103</span>
+            <span class="px">875,000</span><span class="meta">3/2.5</span><span class="meta">2,060</span><span class="meta">27d</span>
+            <span class="sparkline"><span class="bar on" style="height:7px"></span><span class="bar on" style="height:11px"></span><span class="bar on" style="height:8px"></span><span class="bar on" style="height:9px"></span><span class="bar on" style="height:9px"></span></span>
+            <span class="score hi">81</span>
+          </div>
+          <div class="tr">
+            <span class="rk">04</span>
+            <span class="addr"><b>2517 Lombard St</b> · Graduate Hosp · 19146</span>
+            <span class="px">899,000</span><span class="meta">3/2.5</span><span class="meta">2,200</span><span class="meta">3d</span>
+            <span class="sparkline"><span class="bar on" style="height:4px"></span><span class="bar on" style="height:6px"></span><span class="bar on" style="height:11px"></span><span class="bar on" style="height:12px"></span><span class="bar" style="height:3px"></span></span>
+            <span class="score mid">78</span>
+          </div>
+          <div class="tr">
+            <span class="rk">05</span>
+            <span class="addr"><b>1926 Pine St #3</b> · Rittenhouse · 19103</span>
+            <span class="px">729,000</span><span class="meta">2/2</span><span class="meta">1,310</span><span class="meta">41d</span>
+            <span class="sparkline"><span class="bar on" style="height:12px"></span><span class="bar on" style="height:11px"></span><span class="bar" style="height:3px"></span><span class="bar on" style="height:6px"></span><span class="bar on" style="height:7px"></span></span>
+            <span class="score mid">71</span>
+          </div>
+          <div class="tr">
+            <span class="rk">06</span>
+            <span class="addr"><b>2048 Naudain St</b> · Fitler Sq · 19103</span>
+            <span class="px">925,000</span><span class="meta">3/2</span><span class="meta">2,110</span><span class="meta">22d</span>
+            <span class="sparkline"><span class="bar" style="height:2px"></span><span class="bar on" style="height:12px"></span><span class="bar on" style="height:10px"></span><span class="bar on" style="height:10px"></span><span class="bar on" style="height:11px"></span></span>
+            <span class="score lo">68</span>
+          </div>
+          <div class="tr">
+            <span class="rk">07</span>
+            <span class="addr"><b>1814 Delancey Pl</b> · Rittenhouse · 19103</span>
+            <span class="px">875,000</span><span class="meta">3/2.5</span><span class="meta">1,920</span><span class="meta">61d</span>
+            <span class="sparkline"><span class="bar on" style="height:8px"></span><span class="bar on" style="height:10px"></span><span class="bar on" style="height:9px"></span><span class="bar" style="height:4px"></span><span class="bar" style="height:2px"></span></span>
+            <span class="score lo">62</span>
+          </div>
+        </div>
+        <div class="footer">
+          <span class="keys">[<span>J</span>/<span>K</span>] move · [<span>SPACE</span>] select · [<span>F</span>] favorite · [<span>H</span>] hide · [<span>?</span>] explain · [<span>⌘P</span>] packet</span>
+          <span>fmt: heuristic(70) + semantic(20) blend · <span style="color:#7fd27a">●</span> applied 34 · <span style="color:#e6c76b">●</span> no-match 5 · <span style="color:#8a8577">●</span> unavailable 3</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= C. Spatial ======= -->
+  <div class="direction">
+    <div class="direction-head">
+      <div>
+        <div class="label">Direction C</div>
+        <h3 class="dname">The <em>Map</em> View</h3>
+        <div class="picker">
+          <span class="on">Spatial first</span><span class="on">Paper + ink</span><span>Dense</span><span>Narrated</span>
+        </div>
+      </div>
+      <div>
+        <p class="summary">
+          Real-estate is <b>inherently spatial</b> — "3 blocks from the park" matters more than "70 on location." A permanent split: criteria + ranked list on the left, <b>a real map with heat-weighted clusters</b> on the right. Hover a listing → pin pulses; click a pin → card detail docks to the map. Brown/cream cartography, not Google blue.
+        </p>
+        <div class="pros-cons">
+          <span class="pill">Matches how agents think</span>
+          <span class="pill">Makes "near X" tangible</span>
+          <span class="pill watch">Needs real geo data pipeline</span>
+        </div>
+      </div>
+    </div>
+    <div class="mock-wrap">
+      <div class="mock mC">
+        <div class="left">
+          <div class="lhead">
+            <div class="client">SARAH &amp; MIKE JOHNSON</div>
+            <h4>42 properties found</h4>
+            <div class="searchbox">3-bed house in <b>Fitler Square or Rittenhouse</b>, under <b>$900k</b>, garage + outdoor.</div>
+            <div class="lchips">
+              <span class="c acc">Fitler Sq</span><span class="c acc">Rittenhouse</span>
+              <span class="c">≤ $900k</span><span class="c">3+ bd</span><span class="c">Garage</span><span class="c">+ outdoor</span>
+            </div>
+          </div>
+          <div class="llist">
+            <div class="lcard active">
+              <div class="thumb"><span class="badge">01</span></div>
+              <div class="body">
+                <div class="px">$849,000 <span class="match">MATCH 92</span></div>
+                <div class="addr">2412 Pine St · Fitler Square</div>
+                <div class="stats">3 BD · 2.5 BA · 1,980 SF · 14d</div>
+                <div class="why">Row-home with garage and sunny rear patio.</div>
+              </div>
+            </div>
+            <div class="lcard">
+              <div class="thumb"><span class="badge">02</span></div>
+              <div class="body">
+                <div class="px">$795,000 <span class="match">MATCH 86</span></div>
+                <div class="addr">2124 Spruce St · Rittenhouse</div>
+                <div class="stats">3 BD · 2 BA · 1,810 SF · 8d</div>
+                <div class="why">No garage but deeded rear parking.</div>
+              </div>
+            </div>
+            <div class="lcard">
+              <div class="thumb"><span class="badge">03</span></div>
+              <div class="body">
+                <div class="px">$875,000 <span class="match">MATCH 81</span></div>
+                <div class="addr">318 S 22nd St · Fitler Square</div>
+                <div class="stats">3 BD · 2.5 BA · 2,060 SF · 27d</div>
+                <div class="why">Older stock, courtyard, room to negotiate.</div>
+              </div>
+            </div>
+            <div class="lcard">
+              <div class="thumb"><span class="badge">04</span></div>
+              <div class="body">
+                <div class="px">$899,000 <span class="match">MATCH 78</span></div>
+                <div class="addr">2517 Lombard St · Graduate Hosp</div>
+                <div class="stats">3 BD · 2.5 BA · 2,200 SF · 3d</div>
+                <div class="why">Outside Fitler but brand-new build, attached garage.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="map">
+          <div class="grid-bg"></div>
+          <div class="river"></div>
+          <div class="road" style="left: 0; right: 0; top: 30%;"></div>
+          <div class="road" style="left: 0; right: 0; top: 62%;"></div>
+          <div class="road" style="top: 0; bottom: 0; left: 32%; width: 3px; height: auto;"></div>
+          <div class="road" style="top: 0; bottom: 0; left: 64%; width: 3px; height: auto;"></div>
+          <div class="label" style="top: 24%; left: 12%;">Schuylkill River</div>
+          <div class="label" style="top: 8%; left: 44%;">Rittenhouse Sq</div>
+          <div class="label" style="top: 54%; left: 16%;">Fitler Sq</div>
+          <div class="cluster" style="top: 28%; left: 50%;">8</div>
+          <div class="cluster" style="top: 58%; left: 30%;">5</div>
+          <div class="pin hot" style="top: 58%; left: 22%;">1</div>
+          <div class="pin" style="top: 18%; left: 48%;">2</div>
+          <div class="pin" style="top: 60%; left: 38%;">3</div>
+          <div class="pin" style="top: 72%; left: 54%;">4</div>
+          <div class="pin" style="top: 22%; left: 58%;">5</div>
+          <div class="mtop">
+            <div class="tk">Price heatmap</div>
+            <div class="tk">Commute ring</div>
+            <div class="tk">☰</div>
+          </div>
+          <div class="detail">
+            <div class="thumb"></div>
+            <div>
+              <h5>2412 Pine Street</h5>
+              <div class="sub">$849,000 · 3 BD · 2.5 BA · 1,980 SF · 14 days on market</div>
+              <div class="match">MATCH 92 · garage · private rear patio · walk score 98</div>
+            </div>
+            <div class="act">
+              <div class="b">Add to packet</div>
+              <div class="b g">♥ Save</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= D. Conversational / taste ======= -->
+  <div class="direction">
+    <div class="direction-head">
+      <div>
+        <div class="label">Direction D</div>
+        <h3 class="dname">The <em>Taste</em> Profile</h3>
+        <div class="picker">
+          <span>Warm paper</span><span class="on">Conversational</span><span class="on">Learning-visible</span><span>Dense</span>
+        </div>
+      </div>
+      <div>
+        <p class="summary">
+          The folder has a <b>visible personality</b>. As Sarah saves, favorites, and hides listings, a live taste profile builds on the right — with the actual signal categories your schema already tracks (<span class="mono">explicitClientFeedback</span>, <span class="mono">pitchedArtifact</span>, etc.). Search becomes a dialogue; the assistant suggests next prompts; "Why did you hide 2048 Naudain?" can be answered and fed back.
+        </p>
+        <div class="pros-cons">
+          <span class="pill">Shows the ML actually working</span>
+          <span class="pill">Creates agent trust</span>
+          <span class="pill watch">Hardest to build</span>
+        </div>
+      </div>
+    </div>
+    <div class="mock-wrap">
+      <div class="mock mD">
+        <div class="main">
+          <div class="brand">
+            <span class="dot"></span>
+            <span class="name">Ripple</span>
+            <span class="crumb">SARAH &amp; MIKE · 3 SEARCHES · 12 SAVED · 2 PACKETS</span>
+          </div>
+          <div class="thread">
+            <div class="bubble u">3bd in Fitler or Rittenhouse under $900k with garage + outdoor space</div>
+            <div class="bubble a">
+              <div class="lead">Found <b>42 matches</b>. Here are the three I'd open Sarah's packet with — they're the best blend of her stated criteria and the <b>turn-of-century rowhome feel</b> she's been favoriting.</div>
+              <div class="rowcards">
+                <div class="rc">
+                  <div class="tag">MATCH 92 · top pick</div>
+                  <div class="px">$849,000</div>
+                  <div class="addr">2412 Pine St</div>
+                  <div class="note">Hits every hard criterion + matches her vibe of "pre-war, charming patio."</div>
+                  <div class="mini"><span class="a"></span><span class="a"></span><span class="a"></span><span class="a"></span><span class="a"></span></div>
+                </div>
+                <div class="rc">
+                  <div class="tag">MATCH 86 · stretch</div>
+                  <div class="px">$795,000</div>
+                  <div class="addr">2124 Spruce St</div>
+                  <div class="note">No garage, but deeded parking. Worth asking if she'll flex on it.</div>
+                  <div class="mini"><span class="a"></span><span class="a"></span><span class="a"></span><span></span><span class="a"></span></div>
+                </div>
+                <div class="rc">
+                  <div class="tag">MATCH 81 · negotiable</div>
+                  <div class="px">$875,000</div>
+                  <div class="addr">318 S 22nd St</div>
+                  <div class="note">27 days on market — sellers probably flexible. Courtyard, not patio.</div>
+                  <div class="mini"><span class="a"></span><span class="a"></span><span class="a"></span><span class="a"></span><span></span></div>
+                </div>
+              </div>
+              <div class="suggest">
+                <span class="s">Generate packet for top 3 <em>→</em></span>
+                <span class="s">Show the 5 I'd <em>rank lower</em> than heuristic</span>
+                <span class="s">What if we <em>flex garage</em>?</span>
+                <span class="s">Draft email to Sarah</span>
+              </div>
+            </div>
+          </div>
+          <div class="inputbar">
+            <span class="ph">Ask a follow-up, or paste a new brief…<span class="caret"></span></span>
+            <span class="btn">Send ⏎</span>
+          </div>
+        </div>
+        <div class="side">
+          <h6>Sarah's taste · folder profile</h6>
+          <div class="taste">
+            <div class="hdr">Turn-of-century<br>row-home</div>
+            <div class="sub">Built from 12 saves, 4 favorites, 3 hides across 3 searches.</div>
+            <div class="barrow"><span class="lbl">Pre-war stock</span><span class="tk"><span style="width:88%"></span></span><span class="val">0.88</span></div>
+            <div class="barrow"><span class="lbl">Private outdoor</span><span class="tk"><span style="width:82%"></span></span><span class="val">0.82</span></div>
+            <div class="barrow"><span class="lbl">Walkability</span><span class="tk"><span style="width:74%"></span></span><span class="val">0.74</span></div>
+            <div class="barrow"><span class="lbl">Quiet street</span><span class="tk"><span style="width:61%"></span></span><span class="val">0.61</span></div>
+            <div class="barrow"><span class="lbl">New construction</span><span class="tk"><span style="width:18%"></span></span><span class="val">0.18</span></div>
+            <div class="signals">
+              <b>Signals used</b>
+              <div class="pill-row">
+                <span class="p hot">explicit · 2</span>
+                <span class="p">agent-tag · 3</span>
+                <span class="p">pitched · 2</span>
+                <span class="p">soft-pref · 8</span>
+              </div>
+            </div>
+          </div>
+          <div class="learn">
+            <h6 style="margin-top: 0;">Moved by latest feedback</h6>
+            <div class="row"><span class="k">Pre-war weight</span><span class="v up">↑ 0.12</span></div>
+            <div class="row"><span class="k">New-construction weight</span><span class="v dn">↓ 0.09</span></div>
+            <div class="row"><span class="k">Ranker rank-shift (top 20)</span><span class="v">14</span></div>
+            <div class="row"><span class="k">Last signal</span><span class="v">2h ago</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────── IDEAS ─────────────────────── -->
+  <div class="rule"></div>
+  <h2 class="section">Six focused UX upgrades</h2>
+  <p class="section-sub">Small moves that work inside any of the four directions above.</p>
+
+  <div class="ideas">
+
+    <!-- 1. Score explainer -->
+    <div class="idea">
+      <div class="idea-head"><span class="n">01</span><h4>Make the match score <em>clickable</em>.</h4></div>
+      <div class="idea-body">
+        Today the card shows "92 · excellent" with a few tiny bars. You have a full <span class="mono">ScoreBreakdown</span> — including the three-state semantic signal. Turn the score into an explainer popover: stacked sub-scores with weights, and a tag showing whether semantic is <em>applied</em>, <em>no-match</em>, or <em>unavailable</em> (these must stay distinguishable — the schema comment says so).
+      </div>
+      <div class="idea-demo">
+        <div style="font-family: 'Instrument Serif', serif; font-size: 20px; margin-bottom: 4px;">2412 Pine St · 92</div>
+        <div class="mono" style="font-size: 10.5px; color: var(--ink-3); letter-spacing: 0.04em; margin-bottom: 10px;">HEURISTIC 0.89 · SEMANTIC 0.95 · BLEND w=0.2</div>
+        <div class="explain-row"><span class="lbl">Price</span><div class="track"><div class="fill" style="width: 94%"></div></div><span class="val">0.94</span></div>
+        <div class="explain-row"><span class="lbl">Location</span><div class="track"><div class="fill" style="width: 100%"></div></div><span class="val">1.00</span></div>
+        <div class="explain-row"><span class="lbl">Beds</span><div class="track"><div class="fill" style="width: 100%"></div></div><span class="val">1.00</span></div>
+        <div class="explain-row"><span class="lbl">Baths</span><div class="track"><div class="fill" style="width: 90%"></div></div><span class="val">0.90</span></div>
+        <div class="explain-row"><span class="lbl">Features</span><div class="track"><div class="fill" style="width: 80%"></div></div><span class="val">0.80</span></div>
+        <div class="explain-row"><span class="lbl">Pref boost</span><div class="track"><div class="fill moss" style="width: 60%"></div></div><span class="val">+0.12</span></div>
+        <div class="explain-row"><span class="lbl">Semantic</span><div class="track"><div class="fill orange" style="width: 95%"></div><div class="semantic-mark" style="left: 95%"></div></div><span class="val">0.95 <span style="color:var(--moss)">●</span></span></div>
+        <div class="explain-row sum"><span class="lbl">Final</span><div class="track"><div class="fill" style="width: 92%"></div></div><span class="val">0.92</span></div>
+      </div>
+    </div>
+
+    <!-- 2. Criteria chips -->
+    <div class="idea">
+      <div class="idea-head"><span class="n">02</span><h4>Criteria chips as a <em>diff</em>, not a form.</h4></div>
+      <div class="idea-body">
+        The current CriteriaPanel is a shadcn form. But agents want to see <b>what the extractor heard vs. what they corrected</b> — especially when confidence is low or there are ambiguities. Render criteria as chips with three states: extracted, added-by-agent, removed-by-agent. Ambiguities are inline yellow chips the agent resolves by clicking an option.
+      </div>
+      <div class="idea-demo">
+        <div class="mono" style="font-size: 10.5px; color: var(--ink-3); letter-spacing: 0.04em; margin-bottom: 10px;">EXTRACTED · 78% CONFIDENCE · 1 AMBIGUITY</div>
+        <div class="chips-demo" style="margin-bottom: 12px;">
+          <span class="c extr">Fitler Square</span>
+          <span class="c extr">Rittenhouse</span>
+          <span class="c extr">≤ $900k</span>
+          <span class="c extr">3+ bd</span>
+          <span class="c extr">Garage</span>
+          <span class="c ambig">outdoor — yard or balcony?</span>
+          <span class="c add">2+ bath</span>
+          <span class="c remove">property: condo</span>
+          <span class="c edit">year ≥ ____</span>
+        </div>
+        <div class="ambig-card">
+          <div class="q">What counts as "outdoor space" for Sarah?</div>
+          <div class="opts">
+            <span class="opt pick">Any: yard, patio, balcony, roof deck</span>
+            <span class="opt">Ground-level only</span>
+            <span class="opt">Private yard required</span>
+          </div>
+          <div class="meta">RESOLVING WILL RE-RANK · SAVES TO FOLDER SOFT-PREFS</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Folder pulse / activity feed -->
+    <div class="idea">
+      <div class="idea-head"><span class="n">03</span><h4>Folders need a <em>Pulse</em> home.</h4></div>
+      <div class="idea-body">
+        Right now <span class="mono">/folders</span> is a flat list. For an agent with 20 active clients, the question is "who needs me today?" Replace the list with an activity-weighted feed: new listings matching a saved search, stale saves, price drops, packets the client has opened. The product name earns itself.
+      </div>
+      <div class="idea-demo" style="padding: 0;">
+        <div class="pulse-row"><span class="dot hot"></span><div class="client">Sarah &amp; Mike</div><div class="ev"><em>3 new listings</em> match "Fitler 3bd under $900k"</div><div class="time">12m ago</div></div>
+        <div class="pulse-row"><span class="dot warm"></span><div class="client">David Chen</div><div class="ev">Price drop on <em>1926 Pine St</em> — now below his max</div><div class="time">1h</div></div>
+        <div class="pulse-row"><span class="dot warm"></span><div class="client">Linh Tran</div><div class="ev">Opened the packet you sent · viewed <em>4 of 6</em> listings</div><div class="time">3h</div></div>
+        <div class="pulse-row"><span class="dot"></span><div class="client">The Paternos</div><div class="ev">2 favorites went pending — folder has <em>no fresh matches</em></div><div class="time">yday</div></div>
+        <div class="pulse-row"><span class="dot"></span><div class="client">R. Okonkwo</div><div class="ev">No activity · last search <em>11 days ago</em></div><div class="time">—</div></div>
+      </div>
+    </div>
+
+    <!-- 4. Packet preview before generate -->
+    <div class="idea">
+      <div class="idea-head"><span class="n">04</span><h4>Preview the packet <em>before</em> you generate it.</h4></div>
+      <div class="idea-body">
+        The PDF is the product. Today it's a black box — click "Generate," wait, download, hope. Show a thumbnail carousel of the actual page layout, with inline toggles: include agent remarks, include photos, cover letter tone, order. Generation stays async; the preview is a styled placeholder until the artifact flips to <span class="mono">ready</span>.
+      </div>
+      <div class="idea-demo">
+        <div class="packet">
+          <div class="page">
+            <div class="hdr">For Sarah &amp; Mike</div>
+            <div class="mono" style="font-size:5.5px; color:var(--ink-3)">APR 20 · RIPPLE</div>
+            <div class="img"></div>
+            <div style="font-size: 8px; font-weight: 700; margin-top: 2px;">2412 Pine St</div>
+            <div style="font-size: 6px; color: var(--ink-3);">$849,000 · 3bd · 2.5ba</div>
+            <div class="lines" style="margin-top: 4px;">
+              <span class="m"></span><span></span><span class="s"></span><span class="m"></span><span></span>
+            </div>
+            <div class="foot">PAGE 1 / 6</div>
+          </div>
+          <div class="controls">
+            <h5>Packet — 6 listings, 6 pages</h5>
+            <p>One cover letter, one page per listing, one comparison table at the end.</p>
+            <div class="opts">
+              <div class="opt on"><span class="ck"></span>Cover: personalized, mention "Fitler Sq"</div>
+              <div class="opt on"><span class="ck"></span>Include photos (MLS default set)</div>
+              <div class="opt on"><span class="ck"></span>Agent remarks (PII-redacted)</div>
+              <div class="opt"><span class="ck"></span>Include walk score + commute</div>
+              <div class="opt"><span class="ck"></span>Final comparison table</div>
+            </div>
+            <div class="mono" style="font-size:10.5px; color:var(--ink-3); margin-top:10px; letter-spacing: 0.04em;">ESTIMATED ~1.8MB · READY IN 2–4s</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Preference learning ledger -->
+    <div class="idea">
+      <div class="idea-head"><span class="n">05</span><h4>Make the <em>learning</em> visible and revertible.</h4></div>
+      <div class="idea-body">
+        Your schema already distinguishes four signal sources by authority (explicit client → agent-tagged → pitched artifact → search soft-pref). Expose them as a ledger per folder: what moved the ranker, why, and a one-click revert. Trust comes from seeing the machine's reasoning, not from hiding it.
+      </div>
+      <div class="idea-demo">
+        <div class="prefbox">
+          <div class="row"><div class="k">Pre-war character <em>+0.12</em></div><div class="v"><span class="dir up">↑ boost</span><span class="src">explicit · "we love old homes"</span></div></div>
+          <div class="row"><div class="k">Private outdoor <em>+0.08</em></div><div class="v"><span class="dir up">↑ boost</span><span class="src">agent-tag · 3x</span></div></div>
+          <div class="row"><div class="k">New construction <em>−0.09</em></div><div class="v"><span class="dir dn">↓ penalty</span><span class="src">hide · 2517 Lombard</span></div></div>
+          <div class="row"><div class="k">Below 1,500 SF <em>−0.06</em></div><div class="v"><span class="dir dn">↓ penalty</span><span class="src">hide · 2x</span></div></div>
+          <div class="row"><div class="k">High HOA <em>−0.04</em></div><div class="v"><span class="dir dn">↓ penalty</span><span class="src">soft-pref · "no condos"</span></div></div>
+        </div>
+        <div class="mono" style="font-size:10.5px; color:var(--ink-3); margin-top:12px; letter-spacing: 0.04em;">AUTHORITY: EXPLICIT &gt; AGENT-TAG &gt; PITCHED &gt; SOFT-PREF · UNDO ANY · EXPORT LEDGER</div>
+      </div>
+    </div>
+
+    <!-- 6. Hidden = not silent -->
+    <div class="idea">
+      <div class="idea-head"><span class="n">06</span><h4>"Hidden" should narrate, not disappear.</h4></div>
+      <div class="idea-body">
+        Hide currently removes the row — the count shows "6 hidden" but no way to interrogate. Give hide a reason taxonomy (too-small, wrong-block, tenant-occupied, bad-photos, other) that feeds the folder embedding directly. The ranker gets better signal, the agent gets a conversation-starter with the client: "we hid 6 under $700k because none had parking — should we relax that?"
+      </div>
+      <div class="idea-demo">
+        <div class="ambig-card" style="background: #f4f0e4; border-color: #d7d3c8;">
+          <div class="q" style="color:var(--ink);">Hide 1814 Delancey — why?</div>
+          <div class="opts">
+            <span class="opt pick">Wrong block</span>
+            <span class="opt">Too small</span>
+            <span class="opt">Bad light / photos</span>
+            <span class="opt">Tenant-occupied</span>
+            <span class="opt">Already seen it</span>
+            <span class="opt">Other…</span>
+          </div>
+          <div class="meta" style="color: var(--ink-3);">FEEDS FOLDER EMBEDDING · SOURCE = "AGENT-TAG" (AUTHORITY 2 OF 4)</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ─────────────────────── NEXT STEPS ─────────────────────── -->
+  <div class="rule"></div>
+  <h2 class="section">Where I'd go next</h2>
+  <p class="section-sub">If you give me one of these to chase.</p>
+
+  <div class="caveat">
+    <p style="margin: 0 0 10px;"><b>My recommendation</b> — blend <b>A (Editorial)</b> as the visual language with <b>D (Taste profile)</b> as the interaction model, and use <b>C (Map)</b> as a viewmode toggle for geographic queries. Skip B unless your actual users are the high-volume pros who'd value mono density over warmth; it's the most striking direction but also the narrowest.</p>
+    <p style="margin: 0 0 10px;">The six UX upgrades are independent and should land regardless of direction — especially <b>#1 (clickable score)</b>, <b>#2 (criteria diff)</b>, and <b>#4 (packet preview)</b>, all of which are blocked only by design decisions, not infrastructure.</p>
+    <p style="margin: 0;"><b>Tell me which direction to deepen</b> (or mix), and whether you want a <em>real interactive prototype</em> (with the actual TanStack + shadcn stack swapped in) or a hi-fi static mock of a single flow end-to-end — search → criteria → rank → packet preview → download.</p>
+  </div>
+
+</div>
+
+
+</body></html>
