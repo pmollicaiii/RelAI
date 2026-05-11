@@ -16,8 +16,6 @@
  * data accumulates. After that, gating turns on per-pillar.
  */
 
-/* eslint-disable no-console */
-
 interface PillarResult {
   pillar: 1 | 2 | 3 | 4;
   name: string;

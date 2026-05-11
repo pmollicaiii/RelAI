@@ -68,11 +68,9 @@ function SearchSurface({ folder }: { folder: MockFolder }) {
   void folder;
 
   function handleThumb(listingId: string, direction: "up" | "down"): void {
-    // eslint-disable-next-line no-console
     console.log("[SearchSurface] thumb", { listingId, direction });
   }
   function handleAddToPacket(listingId: string): void {
-    // eslint-disable-next-line no-console
     console.log("[SearchSurface] add to packet", { listingId });
   }
 

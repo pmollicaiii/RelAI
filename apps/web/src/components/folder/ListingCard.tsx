@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { formatNumber, formatPrice } from "@/lib/format";
 import type { MockListingCard } from "@/lib/mock-data";
 
 interface ListingCardProps {
@@ -9,11 +10,6 @@ interface ListingCardProps {
   rank: number;
   onThumb?: (listingId: string, direction: "up" | "down") => void;
   onAddToPacket?: (listingId: string) => void;
-}
-
-function formatPrice(p: number): string {
-  if (p >= 1_000_000) return `$${(p / 1_000_000).toFixed(2)}M`;
-  return `$${(p / 1000).toFixed(0)}k`;
 }
 
 export function ListingCard({ listing, rank, onThumb, onAddToPacket }: ListingCardProps) {
@@ -60,7 +56,7 @@ export function ListingCard({ listing, rank, onThumb, onAddToPacket }: ListingCa
         </div>
 
         <p className="text-xs text-very-quiet">
-          {listing.beds} bd · {listing.baths} ba · {listing.sqft.toLocaleString()} sqft
+          {listing.beds} bd · {listing.baths} ba · {formatNumber(listing.sqft)} sqft
         </p>
 
         <p className="text-sm text-ink-2 mt-1 leading-relaxed line-clamp-2">{listing.oneLineWhy}</p>

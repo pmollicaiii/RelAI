@@ -2,15 +2,11 @@
 
 import { useState } from "react";
 
+import { formatNumber, formatPrice } from "@/lib/format";
 import type { MockListingCard } from "@/lib/mock-data";
 
 interface PublicListingStackProps {
   listings: MockListingCard[];
-}
-
-function formatPrice(p: number): string {
-  if (p >= 1_000_000) return `$${(p / 1_000_000).toFixed(2)}M`;
-  return `$${(p / 1000).toFixed(0)}k`;
 }
 
 type Reaction = "heart" | "dismiss" | null;
@@ -58,7 +54,7 @@ export function PublicListingStack({ listings }: PublicListingStackProps) {
             </div>
 
             <p className="text-sm text-quiet">
-              {l.beds} bd · {l.baths} ba · {l.sqft.toLocaleString()} sqft
+              {l.beds} bd · {l.baths} ba · {formatNumber(l.sqft)} sqft
             </p>
 
             <p className="text-base text-ink-2 mt-2 leading-relaxed">{l.oneLineWhy}</p>

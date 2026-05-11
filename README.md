@@ -23,7 +23,7 @@ The wedge is the `client.md` with provenance. No competitor has it.
 
 ## Stack
 
-- **Frontend**: Next.js 15 App Router on Vercel + React 19 + Tailwind v4 + shadcn/ui + Radix UI + Framer Motion + Three.js
+- **Frontend**: Next.js 16 App Router on Vercel + React 19 + Tailwind v4 + shadcn/ui + Radix UI + Framer Motion + Three.js
 - **Backend**: Next.js server actions + Inngest (async orchestration)
 - **Database**: Neon Postgres 16 + pgvector + HNSW
 - **Auth**: Clerk
@@ -70,18 +70,20 @@ pnpm eval         # run LLM eval suites (Promptfoo)
 
 ```
 apps/
-  web/                Next.js 15 — the whole UI + server actions
+  web/                @relai/web        Next.js 16 — the whole UI + server actions
 packages/
-  inference/          Router + cache + audit + PII gate + retry + A/B
-  embedding/          Recipe + cosine + hash gate
-  pii/                redactListingPii + redactContactPii
-  intent/             5-pass extraction prompts + types
-  rerank/             Judge pass + centroid math (positive + avoidance)
-  packet/             Composition + Fair Housing gate + format renderers
-  ontology/           Soft-pref slug definitions + LLM-pending workflow
-  db/                 Drizzle schema + migrations
-eval/                 Promptfoo harness + golden sets per pillar
-docs/                 phase-1-plan.md + ADRs + reference docs
+  inference/          @relai/inference  Router + LRU cache + PII gate + retry + A/B + mock-mode fallback
+  embedding/          @relai/embedding  Recipe + cosine + hash gate + centroid math
+  pii/                @relai/pii        redactListingPii + redactContactPii (pre-LLM gate)
+  intent/             @relai/intent     5-pass extraction prompts + types
+  rerank/             @relai/rerank     Filter pass + two-centroid math + LLM judge orchestration
+  packet/             @relai/packet     Composition + Fair Housing gate + 'steer' guard
+  ontology/           @relai/ontology   ~145 soft-pref slugs across 10 categories
+  mls-adapter/        @relai/mls-adapter CanonicalListing + 95-field data dictionary
+  db/                 @relai/db         Drizzle schema (22 tables) + Neon client + migrations
+eval/                 @relai/eval       Promptfoo-style runner + golden sets per pillar (Week 12)
+docs/                 phase-1-plan.md + design-reference/ripple/ + ADRs
+seed-data/mls/        18 Bright training-data exports (~17k rows union schema)
 ```
 
 ---

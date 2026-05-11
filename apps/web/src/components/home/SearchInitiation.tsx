@@ -28,7 +28,6 @@ export function SearchInitiation({ folders }: SearchInitiationProps) {
 
   function handleSubmit(e: React.FormEvent): void {
     e.preventDefault();
-    // eslint-disable-next-line no-console
     console.log("[SearchInitiation] submit", { mode, text, selectedFolderId });
   }
 

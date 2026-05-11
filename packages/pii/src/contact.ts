@@ -55,6 +55,23 @@ const FREE_TEXT_FIELD_NAMES: ReadonlySet<string> = new Set([
   "message",
   "description",
   "remarks",
+  "transcript",
+  "rawText",
+  "raw_text",
+  "queryText",
+  "query_text",
+  "publicRemarks",
+  "public_remarks",
+  "agentRemarks",
+  "agent_remarks",
+  "sourceQuote",
+  "source_quote",
+  "essence_md",
+  "essenceMd",
+  "content_md",
+  "contentMd",
+  "heroParagraph",
+  "hero_paragraph",
 ]);
 
 // Pragmatic email matcher; conservative TLD length (2-24).

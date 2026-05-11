@@ -1,3 +1,6 @@
+import Image from "next/image";
+
+import { formatDateLong } from "@/lib/format";
 import { quoteForToday } from "@/lib/motivational-quotes";
 
 interface AgentHeaderProps {
@@ -5,27 +8,21 @@ interface AgentHeaderProps {
   avatarUrl?: string;
 }
 
-function formatToday(): string {
-  return new Date().toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
-}
-
 export function AgentHeader({ agentName = "Patrick", avatarUrl }: AgentHeaderProps) {
   const quote = quoteForToday();
-  const today = formatToday();
+  const today = formatDateLong();
 
   return (
     <header className="flex items-center justify-between gap-6 px-6 py-4 border-b border-line">
       <div className="flex items-center gap-3 shrink-0">
         {avatarUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={avatarUrl}
             alt={agentName}
-            className="w-10 h-10 rounded-full border border-line"
+            width={40}
+            height={40}
+            unoptimized
+            className="w-10 h-10 rounded-full border border-line object-cover"
           />
         ) : (
           <div className="w-10 h-10 rounded-full bg-accent-soft text-accent flex items-center justify-center font-medium">

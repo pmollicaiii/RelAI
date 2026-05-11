@@ -21,7 +21,6 @@ if (!databaseUrl) {
   // Don't throw at import-time so package can be imported in test environments
   // that don't need a DB. Code paths that actually touch DB will throw via
   // the neon() call below.
-  // eslint-disable-next-line no-console
   console.warn("[@relai/db] DATABASE_URL not set. DB calls will fail until env is populated.");
 }
 
