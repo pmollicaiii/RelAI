@@ -1,3 +1,24 @@
-// TODO Week 5: centroid math + LLM judge dispatcher.
-// See docs/phase-1-plan.md §8 Week 5 for the scope.
+export {
+  buildCentroid,
+  REACTION_WEIGHT_MULTIPLIERS,
+  type BuildCentroidInput,
+  type CentroidContributor,
+  type ReactionSource,
+} from "./centroid.js";
+
+export {
+  applyFilter,
+  filterListings,
+  type ListingForFilter,
+  type SearchFilter,
+} from "./filter.js";
+
+export {
+  runJudgePass,
+  type ClientProfileForJudge,
+  type JudgeInput,
+  type JudgmentRecord,
+  type ListingForJudge,
+} from "./judge.js";
+
 export const RERANK_RECIPE_VERSION = "v1";
