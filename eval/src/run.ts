@@ -28,7 +28,9 @@ interface PillarResult {
   meanQuality: number; // 0-1
 }
 
-const PILLARS: Array<Omit<PillarResult, "casesRun" | "passed" | "failed" | "skipped" | "meanQuality">> = [
+const PILLARS: Array<
+  Omit<PillarResult, "casesRun" | "passed" | "failed" | "skipped" | "meanQuality">
+> = [
   { pillar: 1, name: "Multimodal listing understanding" },
   { pillar: 2, name: "Client vector with provenance" },
   { pillar: 3, name: "Personalized search" },
@@ -53,9 +55,7 @@ async function main(): Promise<void> {
   const pillarFlag = args.find((a) => a.startsWith("--pillar="));
   const targetPillar = pillarFlag ? Number(pillarFlag.split("=")[1]) : null;
 
-  const toRun = targetPillar
-    ? PILLARS.filter((p) => p.pillar === targetPillar)
-    : PILLARS;
+  const toRun = targetPillar ? PILLARS.filter((p) => p.pillar === targetPillar) : PILLARS;
 
   console.log(`[@relai/eval] Running ${toRun.length} pillar suite(s)...`);
   const results: PillarResult[] = [];
