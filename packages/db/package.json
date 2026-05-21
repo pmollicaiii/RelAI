@@ -17,6 +17,9 @@
     "test:watch": "vitest",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx src/migrate.ts",
+    "db:reset": "tsx src/reset.ts",
+    "db:verify": "tsx src/verify.ts",
+    "db:seed:ontology": "tsx src/seed-ontology.ts",
     "db:studio": "drizzle-kit studio",
     "db:push": "drizzle-kit push",
     "eval": "echo \"No eval for db\" && exit 0"
@@ -24,6 +27,7 @@
   "dependencies": {
     "drizzle-orm": "^0.36.4",
     "@neondatabase/serverless": "^0.10.4",
+    "@relai/ontology": "workspace:*",
     "zod": "^3.24.1"
   },
   "devDependencies": {

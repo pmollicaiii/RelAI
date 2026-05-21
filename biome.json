@@ -18,6 +18,7 @@
       "eval/results",
       "seed-data",
       "docs/design-reference",
+      "packages/db/drizzle",
       "*.zip",
       "pnpm-lock.yaml"
     ]
@@ -44,7 +45,8 @@
         "useExportType": "error",
         "useTemplate": "off",
         "useSingleVarDeclarator": "off",
-        "noInferrableTypes": "off"
+        "noInferrableTypes": "off",
+        "noUnusedTemplateLiteral": "off"
       },
       "complexity": {
         "noBannedTypes": "error",

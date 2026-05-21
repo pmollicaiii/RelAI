@@ -11,11 +11,18 @@ build/
 out/
 *.tsbuildinfo
 
-# Environment
+# Environment — NEVER commit any populated env file.
+# `.env.example` (committed) is the template; everything else stays out.
+.env
 .env.local
 .env.*.local
 .env.development.local
 .env.production.local
+
+# Inbox — secret drop zone (credentials handoff from user to Claude).
+# NEVER let anything here land in git. Contains DB connection strings,
+# API keys, OAuth secrets during integration sprints.
+inbox/
 
 # Logs
 *.log
