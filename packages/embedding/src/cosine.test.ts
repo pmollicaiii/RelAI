@@ -7,7 +7,7 @@ import {
   cosineToUnit,
   normalize,
   weightedMean,
-} from "./cosine.js";
+} from "./cosine";
 
 describe("cosineSimilarity", () => {
   it("returns 1 for identical vectors", () => {

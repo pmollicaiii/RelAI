@@ -6,7 +6,7 @@
  * report update + a CLAUDE.md note.
  */
 
-import type { InferenceTaskKind, TaskRouting } from "./types.js";
+import type { InferenceTaskKind, TaskRouting } from "./types";
 
 export const ROUTER: Record<InferenceTaskKind, TaskRouting> = {
   // Pillar 1 — listing ingest -------------------------------------------------

@@ -1,5 +1,5 @@
-import { SOFT_PREF_SLUGS_V0 } from "./slugs.js";
-import type { SoftPrefCategory, SoftPrefSlugRecord } from "./types.js";
+import { SOFT_PREF_SLUGS_V0 } from "./slugs";
+import type { SoftPrefCategory, SoftPrefSlugRecord } from "./types";
 
 export {
   SoftPrefCategorySchema,
@@ -9,10 +9,10 @@ export {
   type SoftPrefCategory,
   type SoftPrefPolarity,
   type SoftPrefSlugRecord,
-} from "./types.js";
+} from "./types";
 
-export { SOFT_PREF_SLUGS_V0, SOFT_PREF_SLUGS_BY_CATEGORY } from "./slugs.js";
-export { CATEGORIES, getCategoryMeta, type CategoryMeta } from "./categories.js";
+export { SOFT_PREF_SLUGS_V0, SOFT_PREF_SLUGS_BY_CATEGORY } from "./slugs";
+export { CATEGORIES, getCategoryMeta, type CategoryMeta } from "./categories";
 
 // ============================================================================
 // Lookups

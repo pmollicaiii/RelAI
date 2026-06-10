@@ -13,7 +13,7 @@
 export {
   CanonicalListingSchema,
   type CanonicalListing,
-} from "./canonical.js";
+} from "./canonical";
 
 export {
   DATA_DICTIONARY,
@@ -21,6 +21,6 @@ export {
   getColumnDescriptor,
   type ColumnDescriptor,
   type DataDictionary,
-} from "./dictionary/index.js";
+} from "./dictionary/index";
 
 export const MLS_ADAPTER_VERSION = "v1";

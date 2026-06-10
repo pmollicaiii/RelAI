@@ -9,7 +9,7 @@
 
 import { createHash } from "node:crypto";
 
-import type { InferenceTask } from "./types.js";
+import type { InferenceTask } from "./types";
 
 const RECIPE_VERSION = process.env["EMBEDDING_RECIPE_VERSION"] ?? "v1";
 

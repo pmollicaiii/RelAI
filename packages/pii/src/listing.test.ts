@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { LISTING_PII_FIELDS, REDACTED_TOKEN } from "./fields.js";
-import { redactListingPii, redactListingPiiCollection } from "./listing.js";
+import { LISTING_PII_FIELDS, REDACTED_TOKEN } from "./fields";
+import { redactListingPii, redactListingPiiCollection } from "./listing";
 
 describe("redactListingPii", () => {
   it("redacts every PII field at the top-level listing object", () => {

@@ -1,4 +1,4 @@
-import { LISTING_PII_FIELDS, REDACTED_TOKEN } from "./fields.js";
+import { LISTING_PII_FIELDS, REDACTED_TOKEN } from "./fields";
 
 type AnyRecord = Record<string, unknown>;
 

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { ROUTER, pickVariant } from "./router.js";
-import type { InferenceTaskKind } from "./types.js";
+import { ROUTER, pickVariant } from "./router";
+import type { InferenceTaskKind } from "./types";
 
 describe("ROUTER map", () => {
   const ALL_TASK_KINDS: InferenceTaskKind[] = [

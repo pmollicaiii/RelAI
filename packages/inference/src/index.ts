@@ -27,25 +27,25 @@
  * Real-vendor wiring lands in Week 2-3 of the build plan.
  */
 
-import { inferenceCache } from "./cache.js";
-import { computePromptHash } from "./hash.js";
-import { mockHandle } from "./mock.js";
-import { applyPiiGate } from "./pii-gate.js";
-import { retryWithBackoff } from "./retry.js";
-import { ROUTER, pickVariant } from "./router.js";
+import { inferenceCache } from "./cache";
+import { computePromptHash } from "./hash";
+import { mockHandle } from "./mock";
+import { applyPiiGate } from "./pii-gate";
+import { retryWithBackoff } from "./retry";
+import { ROUTER, pickVariant } from "./router";
 import type {
   InferenceCallResult,
   InferenceContext,
   InferenceResult,
   InferenceTask,
   TaskRouting,
-} from "./types.js";
+} from "./types";
 
-export * from "./types.js";
-export { ROUTER, pickVariant } from "./router.js";
-export { retryWithBackoff, defaultIsRetriable, type RetryOptions } from "./retry.js";
-export { computePromptHash } from "./hash.js";
-export { inferenceCache } from "./cache.js";
+export * from "./types";
+export { ROUTER, pickVariant } from "./router";
+export { retryWithBackoff, defaultIsRetriable, type RetryOptions } from "./retry";
+export { computePromptHash } from "./hash";
+export { inferenceCache } from "./cache";
 
 const VENDOR_ENV_KEYS: Record<string, string> = {
   openai: "OPENAI_API_KEY",

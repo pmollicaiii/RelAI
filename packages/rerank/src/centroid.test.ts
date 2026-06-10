@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { REACTION_WEIGHT_MULTIPLIERS, buildCentroid } from "./centroid.js";
+import { REACTION_WEIGHT_MULTIPLIERS, buildCentroid } from "./centroid";
 
 describe("buildCentroid", () => {
   it("returns null when there are no contributors", () => {

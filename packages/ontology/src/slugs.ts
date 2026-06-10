@@ -19,7 +19,7 @@
  * slug uniqueness across categories and makes them self-describing in logs.
  */
 
-import type { SoftPrefSlugRecord } from "./types.js";
+import type { SoftPrefSlugRecord } from "./types";
 
 // ============================================================================
 // 1. Architectural style (~15)

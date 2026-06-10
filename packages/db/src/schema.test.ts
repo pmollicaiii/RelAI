@@ -9,7 +9,7 @@
 
 import { describe, expect, it } from "vitest";
 
-import * as schema from "./schema.js";
+import * as schema from "./schema";
 
 describe("schema exports", () => {
   it("exports all 22 tables", () => {

@@ -29,7 +29,7 @@ import type {
   SlugMappingResult,
   SmsCompressResult,
   TranscriptResult,
-} from "./types.js";
+} from "./types";
 
 const MOCK_MODEL_PREFIX = "mock/";
 

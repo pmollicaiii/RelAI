@@ -1,34 +1,32 @@
-import Image from "next/image";
+import { UserButton } from "@clerk/nextjs";
+import { currentUser } from "@clerk/nextjs/server";
 
 import { formatDateLong } from "@/lib/format";
 import { quoteForToday } from "@/lib/motivational-quotes";
 
-interface AgentHeaderProps {
-  agentName?: string;
-  avatarUrl?: string;
-}
-
-export function AgentHeader({ agentName = "Patrick", avatarUrl }: AgentHeaderProps) {
+/**
+ * Top strip: Clerk avatar + agent name + date on the left, the day's
+ * motivational quote centered, tweaks affordance on the right.
+ *
+ * Server component — reads the session user directly. The UserButton is
+ * Clerk's client island (account menu + sign-out).
+ */
+export async function AgentHeader() {
+  const user = await currentUser();
+  const agentName = user?.firstName ?? user?.fullName ?? "Agent";
   const quote = quoteForToday();
   const today = formatDateLong();
 
   return (
     <header className="flex items-center justify-between gap-6 px-6 py-4 border-b border-line">
       <div className="flex items-center gap-3 shrink-0">
-        {avatarUrl ? (
-          <Image
-            src={avatarUrl}
-            alt={agentName}
-            width={40}
-            height={40}
-            unoptimized
-            className="w-10 h-10 rounded-full border border-line object-cover"
-          />
-        ) : (
-          <div className="w-10 h-10 rounded-full bg-accent-soft text-accent flex items-center justify-center font-medium">
-            {agentName.charAt(0)}
-          </div>
-        )}
+        <UserButton
+          appearance={{
+            elements: {
+              avatarBox: "w-10 h-10 border border-line",
+            },
+          }}
+        />
         <div className="flex flex-col">
           <span className="text-sm font-medium text-ink">{agentName}</span>
           <span className="text-xs text-very-quiet">{today}</span>

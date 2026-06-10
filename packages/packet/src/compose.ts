@@ -18,7 +18,7 @@ import {
   type FairHousingScreenResult,
   mergeScreenResults,
   screenWithKeywords,
-} from "./fair-housing/index.js";
+} from "./fair-housing/index";
 
 export interface ListingForPacket {
   id: string;

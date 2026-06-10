@@ -1,4 +1,4 @@
-import type { SoftPrefCategory } from "./types.js";
+import type { SoftPrefCategory } from "./types";
 
 /**
  * Display metadata for soft-pref categories. Used in Smart Control UI

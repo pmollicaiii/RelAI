@@ -13,7 +13,7 @@
  *     the recipe version; new hashes don't collide with old)
  */
 
-import type { InferenceResult } from "./types.js";
+import type { InferenceResult } from "./types";
 
 interface CacheEntry {
   result: InferenceResult;

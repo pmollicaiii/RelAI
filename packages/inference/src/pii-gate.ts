@@ -12,7 +12,7 @@
 
 import { redactContactPii } from "@relai/pii";
 
-import type { InferenceTask } from "./types.js";
+import type { InferenceTask } from "./types";
 
 /**
  * Returns a redacted copy of the task suitable for sending to a vendor.

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { BANNED_PHRASES } from "./keywords.js";
-import { mergeScreenResults, screenWithKeywords } from "./screen.js";
+import { BANNED_PHRASES } from "./keywords";
+import { mergeScreenResults, screenWithKeywords } from "./screen";
 
 describe("screenWithKeywords — Stage 1 keyword scan", () => {
   it("returns clean result for benign text", () => {

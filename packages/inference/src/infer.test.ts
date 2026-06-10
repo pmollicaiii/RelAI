@@ -7,8 +7,8 @@
 
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { infer, inferMany, inferenceCache } from "./index.js";
-import type { JudgmentResult } from "./types.js";
+import { infer, inferMany, inferenceCache } from "./index";
+import type { JudgmentResult } from "./types";
 
 beforeEach(() => {
   inferenceCache.clear();

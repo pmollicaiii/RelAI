@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { CONTACT_PII_FIELD_PATHS } from "./contact-fields.js";
+import { CONTACT_PII_FIELD_PATHS } from "./contact-fields";
 
 /**
  * PII redactor for CRM contact + communication payloads.

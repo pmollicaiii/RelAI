@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { type ListingForFilter, applyFilter, filterListings } from "./filter.js";
+import { type ListingForFilter, applyFilter, filterListings } from "./filter";
 
 const SAMPLE: ListingForFilter = {
   id: "abc",

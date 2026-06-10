@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { CONTACT_PII_FIELD_PATHS } from "./contact-fields.js";
-import { redactContactPii } from "./contact.js";
+import { redactContactPii } from "./contact";
+import { CONTACT_PII_FIELD_PATHS } from "./contact-fields";
 
 const SEED = "test-agent-id";
 

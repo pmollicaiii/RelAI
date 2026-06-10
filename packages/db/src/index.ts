@@ -1,2 +1,2 @@
-export * from "./schema.js";
-export { db, dbDirect } from "./client.js";
+export * from "./schema";
+export { db, dbDirect } from "./client";

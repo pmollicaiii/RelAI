@@ -6,7 +6,7 @@ import {
   buildEmbeddingInputAndHash,
   hashSourceText,
   yearBuiltBucket,
-} from "./recipe.js";
+} from "./recipe";
 
 const EMPTY: EmbeddingInputSource = {
   publicRemarks: null,

@@ -4,7 +4,7 @@ export {
   hashSourceText,
   yearBuiltBucket,
   type EmbeddingInputSource,
-} from "./recipe.js";
+} from "./recipe";
 
 export {
   cosineSimilarity,
@@ -16,11 +16,11 @@ export {
   type ListingVector,
   type CosineMapResult,
   type SemanticState,
-} from "./cosine.js";
+} from "./cosine";
 
 export {
   DEFAULT_RECIPE_VERSION,
   getRecipeVersion,
   sha256Hex,
   hashesMatch,
-} from "./hash.js";
+} from "./hash";

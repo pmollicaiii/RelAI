@@ -4,7 +4,7 @@ export {
   type ComposedBlock,
   type ComposedPacket,
   type ListingForPacket,
-} from "./compose.js";
-export * from "./fair-housing/index.js";
+} from "./compose";
+export * from "./fair-housing/index";
 
 export const PACKET_RECIPE_VERSION = "v1";

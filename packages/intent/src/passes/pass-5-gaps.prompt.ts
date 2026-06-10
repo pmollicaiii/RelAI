@@ -9,7 +9,7 @@
  * This is the novel feature competitors don't have (per docs/phase-1-plan.md).
  */
 
-import { BUYER_INTERVIEW_CHECKLIST } from "../types.js";
+import { BUYER_INTERVIEW_CHECKLIST } from "../types";
 
 export interface Pass5PromptInput {
   clientState: Record<string, unknown>;

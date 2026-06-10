@@ -7,7 +7,7 @@ import {
   getSlugRecord,
   getSlugsByCategory,
   resolveSlugFromText,
-} from "./index.js";
+} from "./index";
 
 describe("ontology v0 — shape invariants", () => {
   it("has ~145 slugs total (target: 140-160)", () => {

@@ -15,7 +15,7 @@
  * internal surfaces.
  */
 
-import { BANNED_PHRASES, type FairHousingFlag } from "./keywords.js";
+import { BANNED_PHRASES, type FairHousingFlag } from "./keywords";
 
 export interface FairHousingScreenResult {
   flags: FairHousingFlag[];
