@@ -23,7 +23,7 @@ export const ROUTER: Record<InferenceTaskKind, TaskRouting> = {
   },
   essence_doc_generate: {
     taskKind: "essence_doc_generate",
-    modelPrimary: "anthropic/claude-sonnet-4-5",
+    modelPrimary: "anthropic/claude-sonnet-4-6",
     modelChallenger: "google/gemini-2.5-pro",
     challengerPct: 10,
     batchEligible: true,
@@ -48,7 +48,7 @@ export const ROUTER: Record<InferenceTaskKind, TaskRouting> = {
   photo_characterize: {
     taskKind: "photo_characterize",
     modelPrimary: "google/gemini-2.5-flash",
-    modelChallenger: "anthropic/claude-sonnet-4-5",
+    modelChallenger: "anthropic/claude-sonnet-4-6",
     challengerPct: 10,
     batchEligible: true,
     urgency: "background",
@@ -119,7 +119,7 @@ export const ROUTER: Record<InferenceTaskKind, TaskRouting> = {
   },
   extract_soft_preferences: {
     taskKind: "extract_soft_preferences",
-    modelPrimary: "anthropic/claude-sonnet-4-5",
+    modelPrimary: "anthropic/claude-sonnet-4-6",
     modelChallenger: "openai/gpt-4o",
     challengerPct: 10,
     batchEligible: true,
@@ -165,7 +165,7 @@ export const ROUTER: Record<InferenceTaskKind, TaskRouting> = {
   },
   curate_client_md: {
     taskKind: "curate_client_md",
-    modelPrimary: "anthropic/claude-sonnet-4-5",
+    modelPrimary: "anthropic/claude-sonnet-4-6",
     modelChallenger: "google/gemini-2.5-pro",
     challengerPct: 10,
     batchEligible: true,
@@ -181,7 +181,7 @@ export const ROUTER: Record<InferenceTaskKind, TaskRouting> = {
   parse_search_query: {
     taskKind: "parse_search_query",
     modelPrimary: "openai/gpt-4o-mini", // hard + structural prefs
-    modelChallenger: "anthropic/claude-sonnet-4-5", // for soft pref nuance
+    modelChallenger: "anthropic/claude-sonnet-4-6", // for soft pref nuance
     challengerPct: 100, // route soft-pref-bearing portion via Claude
     batchEligible: false,
     urgency: "interactive",
@@ -205,7 +205,7 @@ export const ROUTER: Record<InferenceTaskKind, TaskRouting> = {
   judge_listing_fit: {
     taskKind: "judge_listing_fit",
     modelPrimary: "google/gemini-2.5-flash",
-    modelChallenger: "anthropic/claude-sonnet-4-5",
+    modelChallenger: "anthropic/claude-sonnet-4-6",
     challengerPct: 10,
     batchEligible: false,
     urgency: "interactive",
@@ -230,7 +230,7 @@ export const ROUTER: Record<InferenceTaskKind, TaskRouting> = {
   // Pillar 4 — packets --------------------------------------------------------
   packet_hero_prose: {
     taskKind: "packet_hero_prose",
-    modelPrimary: "anthropic/claude-sonnet-4-5",
+    modelPrimary: "anthropic/claude-sonnet-4-6",
     modelChallenger: "google/gemini-2.5-pro",
     challengerPct: 10,
     batchEligible: false,

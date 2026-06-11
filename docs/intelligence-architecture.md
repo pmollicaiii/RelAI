@@ -34,7 +34,7 @@ Status legend: **LIVE** (real vendor wired) · **mock** (full pipeline runs, moc
 | Task kind | What it does | Model | ~$/call | Status |
 |---|---|---|---|---|
 | `embed_listing_description` | Recipe text → 3072-dim vector | `openai/text-embedding-3-large` | $0.00004 | **LIVE** |
-| `essence_doc_generate` | Facts + remarks + tags → structured "essence" markdown (what this home *is like*) | `anthropic/claude-sonnet-4-5` (challenger `google/gemini-2.5-pro` @10%) | $0.006 | mock |
+| `essence_doc_generate` | Facts + remarks + tags → structured "essence" markdown (what this home *is like*) | `anthropic/claude-sonnet-4-6` (challenger `google/gemini-2.5-pro` @10%) | $0.006 | mock |
 | `embed_listing_essence` | Essence doc → 3072-dim vector | `openai/text-embedding-3-large` | $0.00015 | mock |
 | `photo_characterize` | Photo → room type, condition signals, features, lighting | `google/gemini-2.5-flash` (challenger Sonnet @10%) | $0.0008 | **blocked** — Bright CSVs ship no photo URLs; unblocks with Bright API access |
 | `photo_embed` | Photo → 1024-dim CLIP vector | `replicate/jina-clip-v2` | $0.0003 | **blocked** — same |
@@ -47,11 +47,11 @@ Status legend: **LIVE** (real vendor wired) · **mock** (full pipeline runs, moc
 | `diarize_audio` | Audio → speaker-labelled segments | `assemblyai/universal-2` | $0.06 | mock |
 | `extract_parties` | Pass 1: who is in this household | `openai/gpt-4o-mini` | $0.0001 | mock |
 | `extract_hard_constraints` | Pass 2: budget / beds / areas / dealbreakers | `openai/gpt-4o-mini` | $0.0003 | mock |
-| `extract_soft_preferences` | Pass 3: taste statements, ontology-grounded | `anthropic/claude-sonnet-4-5` (challenger `gpt-4o` @10%) | $0.008 | mock |
+| `extract_soft_preferences` | Pass 3: taste statements, ontology-grounded | `anthropic/claude-sonnet-4-6` (challenger `gpt-4o` @10%) | $0.008 | mock |
 | `extract_contradictions` | Pass 4: new info vs existing state | `openai/gpt-4o-mini` | $0.0003 | mock |
 | `extract_gaps` | Pass 5: what we still don't know | `openai/gpt-4o-mini` | $0.0003 | mock |
 | `embed_soft_pref_statement` | Soft-pref display label → 3072-dim vector | `openai/text-embedding-3-large` | $0.00005 | mock |
-| `curate_client_md` | All facets → the human-readable `client.md` | `anthropic/claude-sonnet-4-5` (challenger Gemini 2.5 Pro @10%) | $0.015 | mock |
+| `curate_client_md` | All facets → the human-readable `client.md` | `anthropic/claude-sonnet-4-6` (challenger Gemini 2.5 Pro @10%) | $0.015 | mock |
 
 ### Pillar 3 — Personalized search (runs per search; the hot path)
 
@@ -66,7 +66,7 @@ Status legend: **LIVE** (real vendor wired) · **mock** (full pipeline runs, moc
 
 | Task kind | What it does | Model | ~$/call | Status |
 |---|---|---|---|---|
-| `packet_hero_prose` | Per-listing personalized paragraph citing the client's own words | `anthropic/claude-sonnet-4-5` (challenger Gemini 2.5 Pro @10%) | $0.018 | mock |
+| `packet_hero_prose` | Per-listing personalized paragraph citing the client's own words | `anthropic/claude-sonnet-4-6` (challenger Gemini 2.5 Pro @10%) | $0.018 | mock |
 | `packet_sms_compress` | Hero paragraph → SMS-length | `openai/gpt-4o-mini` | $0.0001 | mock |
 | `fair_housing_screen_outbound` | Final outbound text → FH flag check | `openai/gpt-4o-mini` | $0.0005 | mock |
 
@@ -119,7 +119,7 @@ L2  Per-corpus vocabulary   days      unmapped phrases → pending gate → onto
 L3  Per-task model quality  weeks     audit + scores + evals → prompt/model promotion
 ```
 
-The keystone is the **audit spine**: `inference_audit` (per-call: task, model, variant, prompt hash, tokens, cost, latency, status) + `inference_quality_scores` (per-audit-row: score source, 0–1 score, rubric). Both tables exist in the schema today; **the write in `infer()` is still a no-op TODO**. Nothing in L3 can close until that write is on — it is the first build item in §5.
+The keystone is the **audit spine**: `inference_audit` (per-call: task, model, variant, prompt hash, tokens, cost, latency, status) + `inference_quality_scores` (per-audit-row: score source, 0–1 score, rubric). **Live since 2026-06-11**: `infer()` writes every real call and cache hit to the ledger fire-and-forget (`packages/inference/src/audit.ts`); errors are classified (`rate_limited` / `retryable_error` / `permanent_error`) and audited before rethrow; mock-mode calls are excluded. `recordQualityScore()` is the write half for the scoring loops. One gap noted for Phase C: the `quality_score_source` enum needs an `implicit_reaction` value (migration) when the nightly agreement job lands — today's values are `golden_set / production_judge / agent_feedback / eval_regression`.
 
 ### Loop 1 — Taste (L1, the product's core loop)
 
@@ -181,7 +181,7 @@ Sequenced to ride the existing Phase-1 pillar schedule — each loop lands with 
 
 | Phase | Scope | Builds | Effort |
 |---|---|---|---|
-| **A. Audit spine** (next inference PR) | Turn on `inference_audit` writes in `infer()` (fire-and-forget, never blocks the call); `recordQualityScore()` helper; backfill meta (tokens/cost) already flows from the embed handler | The keystone — nothing in L3 works without it | Small (1 PR) |
+| **A. Audit spine** — **DONE 2026-06-11** | `inference_audit` writes in `infer()` (fire-and-forget, never blocks the call); `recordQualityScore()` helper; error classification mirrors the retry taxonomy | The keystone — nothing in L3 works without it | Shipped |
 | **B. Taste loop** (with Pillar 3 build) | `client_reactions` write paths (save/hide/favorite UI → server action), centroid recompute on reaction, decay | Loop 1 live | Already on the plan; this just names it |
 | **C. Judge calibration** (right after first real searches) | Nightly Inngest cron: judgments ⋈ reactions agreement rollup → `inference_quality_scores`; disagreement export to `eval/cases/` | Loops 2 + 5 seeded with real data | Medium (1–2 PRs) |
 | **D. Eval golden sets** (Week 5–6 per plan) | 5–10 cases per task family (intent, judge, FH, prose-rubric); `pnpm eval` wired into CI non-gating | Loop 5 operational | Medium |
@@ -192,8 +192,8 @@ What stays **manual in V1** (locked decisions, unchanged): challenger promotion,
 
 ---
 
-## 6. Open decisions (tracked)
+## 6. Decisions (ratified 2026-06-11; also logged in plan §19 #32)
 
-1. **Sonnet 4.5 → 4.6 bump** — recommended at Anthropic-vendor-wiring time (same PR), since the handler should be written against adaptive thinking (the 4.6 API), not the deprecated `budget_tokens` shape. *(Decision pending.)*
-2. **Phase-A-first sequencing** — audit writes before any further vendor handlers, so every real call from day one is in the ledger. *(Decision pending.)*
-3. **V1 quality-score sources** — golden evals + implicit reaction metric only (free, automatic), vs also LLM-judge sampling of prod outputs (richer but adds cost/complexity). Recommendation: defer LLM-judge scoring to Phase F; the implicit metric is the one that can't be gamed. *(Decision pending.)*
+1. **Sonnet 4.5 → 4.6 bump** — **DONE**: router config bumped immediately (4.5 went legacy; same price). The Anthropic vendor handler, when it lands, targets the adaptive-thinking API.
+2. **Phase-A-first sequencing** — **DONE**: audit writes shipped before further vendor handlers; every real call from here on is in the ledger.
+3. **V1 quality-score sources** — **RATIFIED**: golden evals + the implicit judge-vs-reaction agreement metric. LLM-judge sampling of production outputs is deferred to Phase F (the implicit metric is the one that can't be gamed).

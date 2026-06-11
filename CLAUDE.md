@@ -368,7 +368,7 @@ The plan lives at [`docs/phase-1-plan.md`](docs/phase-1-plan.md) and is the sing
 - Two-centroid math (positive + avoidance), recomputed on-demand
 - 5-pass extraction (parties / hard / soft / contradictions / gaps)
 - Inference router as hard discipline; manual A/B promotion in V1
-- Model assignment: Claude Sonnet 4.5 (essence + soft-pref + client.md + packet prose); Gemini 2.5 Flash (judge + photo VLM); gpt-4o-mini (structural extraction + Fair Housing classifier); text-embedding-3-large (all text embeddings); Jina CLIP v2 (photo embeddings)
+- Model assignment: Claude Sonnet **4.6** (essence + soft-pref + client.md + packet prose — bumped from 4.5 on 2026-06-11 when 4.5 went legacy; same price, adaptive-thinking API); Gemini 2.5 Flash (judge + photo VLM); gpt-4o-mini (structural extraction + Fair Housing classifier); text-embedding-3-large (all text embeddings); Jina CLIP v2 (photo embeddings). Full rationale + improvement-loop plan: [`docs/intelligence-architecture.md`](docs/intelligence-architecture.md)
 - 6-tier vectorization recipe with hash-gated re-embed
 - V2 pricing: subscription + overage ($79 Starter / $199 Pro / Enterprise custom); V1 free dogfood with full metering
 - Solo agents first, brokerage later

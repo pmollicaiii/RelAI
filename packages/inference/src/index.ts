@@ -8,6 +8,8 @@
  *   - `ROUTER` — task → model mapping (re-exported)
  *   - `pickVariant(routing, cacheKey)` — A/B helper
  *   - `inferenceCache` — in-process LRU (re-exported for admin tests + reset)
+ *   - `recordQualityScore` — attach a 0–1 score to an audit row (eval runner,
+ *     nightly agreement job, agent feedback)
  *
  * Per-call flow (in this order):
  *   1. Look up routing config
@@ -15,18 +17,21 @@
  *   3. Pick variant (primary vs challenger via deterministic hash bucketing)
  *   4. Cache lookup (per routing.cacheable + cacheTtlSeconds)
  *   5. PII redaction gate (per routing.redactPii)
- *   6. Mock fallback OR real vendor SDK call (with retry)
+ *   6. Mock fallback OR real vendor call (with retry)
  *   7. Cache store (per routing.cacheable)
- *   8. (TODO when @relai/db DATABASE_URL lands) audit write to inference_audit
+ *   8. Audit write to inference_audit — fire-and-forget, never blocks the
+ *     call; cache hits audited as status='cached'; mock calls not audited
  *
  * In mock mode (`INFERENCE_MODE=mock` or any missing API key), tasks are
- * served by `mockHandle` so the app boots without real keys.
+ * served by `mockHandle` so the app boots without real keys. Mock is
+ * dev-only: in NODE_ENV=production a missing vendor key throws.
  *
- * The real vendor SDK clients will be loaded lazily so a missing key
- * doesn't crash at import time — only at the call site that needs it.
- * Real-vendor wiring lands in Week 2-3 of the build plan.
+ * Vendor clients load lazily so a missing key never crashes at import
+ * time. Wired today: OpenAI embeddings (all four embed_* kinds). Chat /
+ * vision / STT handlers land with their milestones (Week 3+).
  */
 
+import { classifyErrorStatus, writeAuditFireAndForget } from "./audit";
 import { inferenceCache } from "./cache";
 import { computePromptHash } from "./hash";
 import { mockHandle } from "./mock";
@@ -41,6 +46,9 @@ import type {
   TaskRouting,
 } from "./types";
 import { openaiEmbed } from "./vendors/openai";
+
+export { recordQualityScore, writeAuditFireAndForget, classifyErrorStatus } from "./audit";
+export type { AuditEntry, AuditStatus, QualityScoreSource } from "./audit";
 
 export * from "./types";
 export { ROUTER, pickVariant } from "./router";
@@ -114,6 +122,20 @@ export async function infer<T extends InferenceResult = InferenceResult>(
   if (routing.cacheable) {
     const cached = inferenceCache.get(promptHash);
     if (cached) {
+      writeAuditFireAndForget({
+        taskKind: task.kind,
+        modelUsed,
+        modelVariant: variant,
+        promptHash,
+        cacheHit: true,
+        tokensIn: 0,
+        tokensOut: 0,
+        costUsd: 0,
+        latencyMs: 0,
+        status: "cached",
+        agentId: ctx.agentId,
+        folderId: ctx.folderId,
+      });
       return {
         result: cached as T,
         meta: {
@@ -138,26 +160,64 @@ export async function infer<T extends InferenceResult = InferenceResult>(
   let result: InferenceResult;
   let tokensIn = 0;
   let costUsd = 0;
+  const usedMock = shouldUseMock(routing, ctx);
 
-  if (shouldUseMock(routing, ctx)) {
+  if (usedMock) {
     result = mockHandle(taskForVendor);
   } else {
-    const real = await retryWithBackoff(() => realHandle(taskForVendor, modelUsed));
-    result = real.result;
-    tokensIn = real.tokensIn;
-    costUsd = real.costUsd;
+    try {
+      const real = await retryWithBackoff(() => realHandle(taskForVendor, modelUsed));
+      result = real.result;
+      tokensIn = real.tokensIn;
+      costUsd = real.costUsd;
+    } catch (err) {
+      // (8) Audit the failure, then rethrow — the ledger sees every real
+      // call, including the ones that died after retries.
+      const { status, errorClass } = classifyErrorStatus(err);
+      writeAuditFireAndForget({
+        taskKind: task.kind,
+        modelUsed,
+        modelVariant: variant,
+        promptHash,
+        cacheHit: false,
+        tokensIn: 0,
+        tokensOut: 0,
+        costUsd: 0,
+        latencyMs: Date.now() - startedAt,
+        status,
+        errorClass,
+        agentId: ctx.agentId,
+        folderId: ctx.folderId,
+      });
+      throw err;
+    }
   }
 
   const latencyMs = Date.now() - startedAt;
+
+  // (8) Audit write — fire-and-forget; mock-mode calls are not audited
+  // (dev-only noise; prod throws before mock can be reached).
+  if (!usedMock) {
+    writeAuditFireAndForget({
+      taskKind: task.kind,
+      modelUsed,
+      modelVariant: variant,
+      promptHash,
+      cacheHit: false,
+      tokensIn,
+      tokensOut: 0,
+      costUsd,
+      latencyMs,
+      status: "ok",
+      agentId: ctx.agentId,
+      folderId: ctx.folderId,
+    });
+  }
 
   // (7) Cache store
   if (routing.cacheable) {
     inferenceCache.set(promptHash, result, routing.cacheTtlSeconds);
   }
-
-  // (8) Audit write — wires up once @relai/db DATABASE_URL is configured
-  // (planned for Week 1). Today this is a no-op so the package is usable
-  // without a live DB connection.
 
   return {
     result: result as T,

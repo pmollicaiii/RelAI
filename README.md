@@ -28,7 +28,7 @@ The wedge is the `client.md` with provenance. No competitor has it.
 - **Database**: Neon Postgres 16 + pgvector + HNSW
 - **Auth**: Clerk
 - **Storage**: Cloudflare R2
-- **Inference**: OpenAI (gpt-4o-mini, gpt-4o-transcribe, text-embedding-3-large) + Anthropic (Claude Sonnet 4.5) + Google (Gemini 2.5 Flash) + Replicate (Jina CLIP v2) + AssemblyAI (diarization) — all gated through `packages/inference` router
+- **Inference**: OpenAI (gpt-4o-mini, gpt-4o-transcribe, text-embedding-3-large) + Anthropic (Claude Sonnet 4.6) + Google (Gemini 2.5 Flash) + Replicate (Jina CLIP v2) + AssemblyAI (diarization) — all gated through `packages/inference` router
 - **Observability**: Sentry + Vercel Analytics + `inference_audit` table
 - **Eval**: Promptfoo (`pnpm eval` runs in <60s locally)
 - **Linter/Formatter**: Biome

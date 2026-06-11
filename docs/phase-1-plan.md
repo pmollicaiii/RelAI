@@ -1362,6 +1362,7 @@ This plan v2 incorporates the following user-locked decisions (in order ratified
 29. Diarization as standalone surface, not hidden in audio pipeline
 30. UI layout: Home Page (top margin agent/avatar/date/quote + left toolbar folders + center search initiation); Client Folder page (3-surface carousel Search/Outreach/Profile)
 31. Design system from V1.html preserved (mood / pace / voice / density Tweaks; default aurora; orb3d visualization)
+32. *(2026-06-11)* Anthropic prose model bumped Sonnet 4.5 → **Sonnet 4.6** (4.5 went legacy; same price, adaptive-thinking API). Decision #15's role assignments unchanged. Improvement-loop plan ratified: audit spine first, V1 quality scores = golden evals + implicit reaction agreement (no LLM-judge sampling until post-V1). See `docs/intelligence-architecture.md`.
 
 ---
 
