@@ -100,6 +100,12 @@ importers:
       '@neondatabase/serverless':
         specifier: ^0.10.4
         version: 0.10.4
+      '@relai/embedding':
+        specifier: workspace:*
+        version: link:../embedding
+      '@relai/mls-adapter':
+        specifier: workspace:*
+        version: link:../mls-adapter
       '@relai/ontology':
         specifier: workspace:*
         version: link:../ontology

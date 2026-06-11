@@ -1,19 +1,11 @@
 /**
- * @relai/mls-adapter — CSV/XLSX → CanonicalListing.
+ * @relai/mls-adapter — Bright CSV → CanonicalListing.
  *
- * V1 scaffold: only types + data-dictionary access. Full parser
- * implementation lands in Week 2 of the build plan; see
- * `docs/phase-1-plan.md` §8 Week 2.
- *
- * For now the package exposes:
- *   - CanonicalListing Zod schema (consumed by @relai/db inserts)
- *   - DATA_DICTIONARY (consumed by Pass-2 extraction prompts)
+ * V1 scope: Residential Lease exports only (all CSV). The XLSX path +
+ * Bright API transport land when sale listings / live API come into scope.
  */
 
-export {
-  CanonicalListingSchema,
-  type CanonicalListing,
-} from "./canonical";
+export { CanonicalListingSchema, type CanonicalListing } from "./canonical";
 
 export {
   DATA_DICTIONARY,
@@ -22,5 +14,19 @@ export {
   type ColumnDescriptor,
   type DataDictionary,
 } from "./dictionary/index";
+
+export {
+  BRIGHT_FIELDS,
+  decodeHtmlEntities,
+  pick,
+  splitToSlugs,
+  toBoolYN,
+  toNum,
+  toStr,
+  type BrightRecord,
+} from "./bright/field-map";
+
+export { mapBrightRecord, type MapOptions } from "./bright/mapper";
+export { parseBrightCsv, type ParseResult } from "./bright/csv";
 
 export const MLS_ADAPTER_VERSION = "v1";
