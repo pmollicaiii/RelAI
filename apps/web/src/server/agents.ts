@@ -11,8 +11,7 @@
  */
 
 import { currentUser } from "@clerk/nextjs/server";
-import { agents, db } from "@relai/db";
-import { eq } from "drizzle-orm";
+import { agents, db, eq } from "@relai/db";
 
 export type AgentRow = typeof agents.$inferSelect;
 
@@ -26,11 +25,7 @@ export async function ensureAgent(): Promise<AgentRow | null> {
   const user = await currentUser();
   if (!user) return null;
 
-  const existing = await db
-    .select()
-    .from(agents)
-    .where(eq(agents.clerkUserId, user.id))
-    .limit(1);
+  const existing = await db.select().from(agents).where(eq(agents.clerkUserId, user.id)).limit(1);
   if (existing[0]) return existing[0];
 
   const primaryEmail =

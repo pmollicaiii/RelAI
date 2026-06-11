@@ -4,7 +4,8 @@
  * Default-deny: every route requires a session EXCEPT the public surface:
  *   - /sign-in, /sign-up — Clerk's hosted auth pages
  *   - /p/[slug]          — public packet links (buyers tap these from SMS/email; no account)
- *   - /api/webhooks/*    — vendor callbacks (Clerk, later Inngest/Resend) verified by signature, not session
+ *   - /api/webhooks/*    — vendor callbacks (Clerk, later Resend) verified by signature, not session
+ *   - /api/inngest       — Inngest Cloud function invocations, verified by INNGEST_SIGNING_KEY
  *
  * CLAUDE.md §6: the public packet link's HMAC slug is its own auth; never
  * put Clerk in front of it.
@@ -17,6 +18,7 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   "/p/(.*)",
   "/api/webhooks/(.*)",
+  "/api/inngest(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
