@@ -89,9 +89,11 @@ RelAI/
 ├── docs/
 │   ├── phase-1-plan.md       The locked V1 plan (1,393 lines, source of truth)
 │   └── design-reference/     Claude Design handoff (HTML/JSX/CSS)
-│       └── ripple/
+│       └── relai/            RelAI V1 bundle (2026-06-10) — JSX/CSS source of the live UI port
 └── .github/workflows/ci.yml  Typecheck + Biome + Vitest + non-gating evals
 ```
+
+The live UI is a faithful TypeScript port of the design bundle: `apps/web/src/app/design.css` (verbatim CSS + next/font variable mapping), `apps/web/src/components/relai/*` (HomeView, FolderView, SmartControl, FolderTabs, SidebarNav, WaterOrb, Pool, WaterlineRipples, ripple-clock singleton, icons), `apps/web/src/lib/relai-data.ts` (typed prototype dataset — the shapes are the contract the Week-2 Drizzle swap fills).
 
 The plan refers to "eight packages"; the actual count is nine because `mls-adapter` was ported from the archive and kept distinct from `embedding` (the recipe lives in `embedding`, the parsing in `mls-adapter`). Same architectural shape.
 
@@ -339,6 +341,9 @@ These pairs/triples drift quietly. Update them together in the same PR.
 - **No raw SDK calls** outside `packages/inference`. Importing `openai`, `@anthropic-ai/sdk`, etc. directly in `apps/web/` or any other package is a Biome lint error. Use the router.
 - **Local dev without API keys**: the inference router has a `mock` mode (env var `INFERENCE_MODE=mock`). Returns deterministic stub outputs so the app boots and pages render. NEVER ship `INFERENCE_MODE=mock` to prod.
 - **The archive repo** at `C:/dev/Pulse MLS Search App/` and `github.com/pmollicaiii/RelAI-Archive` is **READ-ONLY reference**. Never `git pull` it. Never write to its directory. The translation map in `docs/phase-1-plan.md` §13 lists what was ported forward.
+- **The app shell is `.app > .sidebar + main.main > .content`.** Pages must render inside `<main className="main">` or `.content` loses its `max-width: 1280px; margin: 0 auto` centering (it's a `.main > .content` child selector) and shrinks to fit as a bare flex child. Both routes do this today — keep the wrapper when adding routes.
+- **`design.css` font families are next/font CSS variables**, not literal names: `var(--font-sans-inter)` / `var(--font-serif-instrument)` / `var(--font-mono-jetbrains)` (registered in `layout.tsx`). A new design handoff re-concat must re-apply that replacement (`'Inter',` → `var(--font-sans-inter),` etc.) or fonts silently fall back.
+- **Biome suppressions in JSX must sit directly above the flagged attribute** (e.g. the `role=` line inside the attribute list), not above the element — Biome 1.9 anchors `useSemanticElements` diagnostics at the attribute and reports element-level comments as unused suppressions.
 
 ---
 
