@@ -37,20 +37,22 @@ export default async function FolderPage({ params }: FolderPageProps) {
         agentName={agentName}
         agentSubtitle={agent?.email ?? undefined}
       />
-      <FolderView
-        folder={folder}
-        data={{
-          listings: LISTINGS,
-          ambiguity: AMBIGUITY,
-          extractedCriteria: EXTRACTED_CRITERIA,
-          preferenceLedger: PREFERENCE_LEDGER,
-          chipLibrary: CHIP_LIBRARY,
-          activeChips: ACTIVE_CHIPS,
-          chipCategories: CHIP_CATEGORIES,
-          artifacts: ARTIFACTS,
-          profileEvents: PROFILE_EVENTS,
-        }}
-      />
+      <main className="main">
+        <FolderView
+          folder={folder}
+          data={{
+            listings: LISTINGS,
+            ambiguity: AMBIGUITY,
+            extractedCriteria: EXTRACTED_CRITERIA,
+            preferenceLedger: PREFERENCE_LEDGER,
+            chipLibrary: CHIP_LIBRARY,
+            activeChips: ACTIVE_CHIPS,
+            chipCategories: CHIP_CATEGORIES,
+            artifacts: ARTIFACTS,
+            profileEvents: PROFILE_EVENTS,
+          }}
+        />
+      </main>
     </div>
   );
 }

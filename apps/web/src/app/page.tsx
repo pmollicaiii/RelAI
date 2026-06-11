@@ -18,7 +18,9 @@ export default async function HomePage() {
         agentName={agentName}
         agentSubtitle={agent?.email ?? undefined}
       />
-      <HomeView folders={FOLDERS} pulse={PULSE} agentFirstName={firstName} />
+      <main className="main">
+        <HomeView folders={FOLDERS} pulse={PULSE} agentFirstName={firstName} />
+      </main>
     </div>
   );
 }

@@ -25,18 +25,37 @@ export async function ensureAgent(): Promise<AgentRow | null> {
   const user = await currentUser();
   if (!user) return null;
 
-  const existing = await db.select().from(agents).where(eq(agents.clerkUserId, user.id)).limit(1);
-  if (existing[0]) return existing[0];
-
   const primaryEmail =
     user.emailAddresses.find((e) => e.id === user.primaryEmailAddressId)?.emailAddress ??
     user.emailAddresses[0]?.emailAddress;
+
+  const name = [user.firstName, user.lastName].filter(Boolean).join(" ") || null;
+
+  const existing = await db.select().from(agents).where(eq(agents.clerkUserId, user.id)).limit(1);
+  if (existing[0]) {
+    // Refresh stale identity fields (e.g. row provisioned before the user
+    // filled in their Clerk profile, or webhook delivery lagged an update).
+    const staleName = name !== null && existing[0].name !== name;
+    const staleEmail = primaryEmail !== undefined && existing[0].email !== primaryEmail;
+    if (staleName || staleEmail) {
+      const refreshed = await db
+        .update(agents)
+        .set({
+          ...(staleName ? { name } : {}),
+          ...(staleEmail ? { email: primaryEmail } : {}),
+          updatedAt: new Date(),
+        })
+        .where(eq(agents.clerkUserId, user.id))
+        .returning();
+      return refreshed[0] ?? existing[0];
+    }
+    return existing[0];
+  }
+
   if (!primaryEmail) {
     console.warn(`[ensureAgent] Clerk user ${user.id} has no email; cannot provision`);
     return null;
   }
-
-  const name = [user.firstName, user.lastName].filter(Boolean).join(" ") || null;
 
   const inserted = await db
     .insert(agents)
