@@ -25,7 +25,7 @@ export function useOrbBob(listening: boolean) {
   }, [listening]);
   useEffect(() => {
     let curAmp = 6;
-    const unsub = rippleClock.subscribe(({ bob, sinceSplash }) => {
+    const apply = ({ bob, sinceSplash }: RippleState) => {
       const el = ref.current;
       if (!el) return;
       // If a CSS animation is driving us (dive), step aside and let it run.
@@ -37,7 +37,9 @@ export function useOrbBob(listening: boolean) {
         Math.exp(-sinceSplash * 4) * Math.sin(sinceSplash * 22) * (listeningRef.current ? 3 : 1.4);
       const y = -bob * curAmp + recoil + sink;
       el.style.transform = `translateY(${y.toFixed(2)}px)`;
-    });
+    };
+    const unsub = rippleClock.subscribe(apply);
+    apply(rippleClock.snapshot());
     return unsub;
   }, []);
   return ref;
@@ -199,7 +201,7 @@ export function WaterlineRipples({
       return { dPath, dSpec, dMotes };
     }
 
-    const unsub = rippleClock.subscribe((state) => {
+    function paint(state: RippleState) {
       const { dPath, dSpec, dMotes } = buildFrame(state);
       rightBase.current?.setAttribute("d", dPath);
       leftBase.current?.setAttribute("d", dPath);
@@ -209,7 +211,11 @@ export function WaterlineRipples({
       leftSpec.current?.setAttribute("d", dSpec);
       rightMotes.current?.setAttribute("d", dMotes);
       leftMotes.current?.setAttribute("d", dMotes);
-    });
+    }
+    const unsub = rippleClock.subscribe(paint);
+    // Synchronous first paint — rAF is suspended in hidden tabs, and the
+    // waterline must never sit as a naked depth band with no wave line.
+    paint(rippleClock.snapshot());
     return unsub;
   }, []);
 

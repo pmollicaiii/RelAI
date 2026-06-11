@@ -41,6 +41,10 @@ class RippleClock {
     if (this.running || typeof window === "undefined") return;
     this.running = true;
     this.start = performance.now();
+    // Seed one mid-flight splash so the very first paint already shows a
+    // wave train near the orb instead of a flat line (the first natural
+    // splash only lands at the bob's first downward zero-crossing).
+    this.emitSplash(-0.6, 1.0);
     const tick = (now: number) => {
       const s = this.getState(now);
       for (const fn of this.subs) {
@@ -88,6 +92,16 @@ class RippleClock {
     this.ensureRunning();
     this.subs.add(fn);
     return () => this.subs.delete(fn);
+  }
+
+  /**
+   * Current state without subscribing. Lets consumers paint one frame
+   * synchronously at mount so the surface is never blank before the
+   * first rAF tick (rAF is fully suspended in hidden tabs).
+   */
+  snapshot(): RippleState {
+    this.ensureRunning();
+    return this.getState(typeof performance !== "undefined" ? performance.now() : 0);
   }
 
   /** Force a splash NOW (search-submit, etc). strength scales amplitude. */

@@ -41,7 +41,7 @@ export default function RootLayout({
         data-mood="aurora"
         className={`${inter.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} h-full antialiased`}
       >
-        <body data-density="compact" data-voice="press" className="h-full">
+        <body data-density="regular" data-voice="press" className="h-full">
           {children}
         </body>
       </html>

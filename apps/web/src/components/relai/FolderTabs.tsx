@@ -290,7 +290,7 @@ export function ProfileTab({
             ))}
           </div>
           <div className="ft-profile-foot mono">
-            PROVENANCE: A1 EXPLICIT · A2 AGENT-TAG · A3 SAVE/FAV · A4 IMPLICIT
+            AUTHORITY: A1 EXPLICIT · A2 AGENT-TAG · A3 SAVE/FAV · A4 IMPLICIT
           </div>
         </section>
 

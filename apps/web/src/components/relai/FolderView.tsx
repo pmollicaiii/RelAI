@@ -514,7 +514,7 @@ function ListingRow({
               </button>
             ))}
           </div>
-          <div className="meta">FEEDS FOLDER EMBEDDING · SOURCE = AGENT-TAG (PROVENANCE 2/4)</div>
+          <div className="meta">FEEDS FOLDER EMBEDDING · SOURCE = AGENT-TAG (AUTHORITY 2/4)</div>
         </div>
       )}
     </div>

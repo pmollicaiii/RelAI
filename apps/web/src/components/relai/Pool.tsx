@@ -262,7 +262,9 @@ export function Pool({ listening, submitting }: { listening: boolean; submitting
 
       raf = requestAnimationFrame(frame);
     }
-    raf = requestAnimationFrame(frame);
+    // Draw the first frame synchronously (rAF is suspended in hidden tabs);
+    // frame() schedules its own successor, so this also starts the loop.
+    frame(performance.now());
 
     return () => {
       cancelAnimationFrame(raf);

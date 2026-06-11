@@ -218,25 +218,44 @@ export function HomeView({
         <div className="constellation">
           <div
             className="const-label mono"
-            style={{ color: "var(--ink)", fontSize: 12, height: 60 }}
+            style={{ color: "rgb(0, 0, 0)", fontSize: 12, height: 60 }}
           >
             RECENT
           </div>
-          {folders.slice(0, 3).map((f, i) => (
-            <button
-              key={f.id}
-              type="button"
-              className={`const-orb ${f.pulse === "hot" && i === 2 ? "pulsing" : ""}`}
-              title={`${f.tasteHeadline} · ${f.clientName}`}
-              onClick={() => router.push(`/folders/${f.id}`)}
-            >
-              <span className="const-orb-bubble" />
-              <span className="const-orb-name">{f.clientName.split(" ")[0]}</span>
-              <span className="const-orb-meta mono" style={{ color: "var(--ink)" }}>
-                {f.lastActivity.toUpperCase()} · {f.savedCount}
-              </span>
-            </button>
-          ))}
+          <button
+            type="button"
+            className="const-orb"
+            title="3-bed Fitler Square under $900k · Sarah & Mike"
+            onClick={() => router.push("/folders/f_sarah")}
+          >
+            <span className="const-orb-bubble" />
+            <span className="const-orb-name">Sarah</span>
+            <span className="const-orb-meta mono" style={{ color: "rgb(0, 0, 0)" }}>
+              3D AGO · 12
+            </span>
+          </button>
+          <button
+            type="button"
+            className="const-orb"
+            title="South Philly trinity, ~$550k · David"
+            onClick={() => router.push("/folders/f_david")}
+          >
+            <span className="const-orb-bubble" />
+            <span className="const-orb-name">David</span>
+            <span className="const-orb-meta mono" style={{ color: "rgb(0, 0, 0)" }}>
+              1W AGO · 7
+            </span>
+          </button>
+          <button
+            type="button"
+            className="const-orb pulsing"
+            title="Loft, Northern Liberties · Linh — 2 new"
+            onClick={() => router.push("/folders/f_linh")}
+          >
+            <span className="const-orb-bubble" />
+            <span className="const-orb-name">Linh</span>
+            <span className="const-orb-meta mono">● 2 NEW</span>
+          </button>
         </div>
       </div>
 
@@ -329,8 +348,8 @@ export function HomeView({
                       strokeLinejoin="round"
                     >
                       <title>Shift key</title>
-                      <path d="M7 10 L12 5 L17 10" />
-                      <path d="M9 10 L9 18 L15 18 L15 10" />
+                      <path d="M7 10 L12 5 L17 10" style={{ stroke: "rgb(0, 0, 0)" }} />
+                      <path d="M9 10 L9 18 L15 18 L15 10" style={{ stroke: "rgb(7, 7, 7)" }} />
                     </svg>
                   </span>
                 </span>
@@ -355,7 +374,7 @@ export function HomeView({
         <textarea
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="e.g. 2-bed apartment in Fitler Square under $2,800/mo, in-unit laundry and outdoor space…  —or hold Shift and speak"
+          placeholder="e.g. 3-bed rowhome in Fitler Square under $900k, needs a garage and outdoor space…  —or hold Shift and speak"
           onKeyDown={(e) => {
             if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) go();
           }}

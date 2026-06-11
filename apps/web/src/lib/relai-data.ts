@@ -248,9 +248,9 @@ export const LISTINGS: RelaiListing[] = [
     featureScore: 0.88,
     preferenceBoost: 0.12,
     whyHighlights: [
-      ["private rear patio", "outdoor"],
+      ["private back patio", "outdoor"],
       ["one-car garage", "garage"],
-      ["roof deck", "outdoor"],
+      ["sunny roof deck", "outdoor"],
     ],
     lat: 0.58,
     lng: 0.22,
@@ -324,7 +324,7 @@ export const LISTINGS: RelaiListing[] = [
     featureScore: 0.84,
     preferenceBoost: 0.1,
     whyHighlights: [
-      ["Attached garage", "garage"],
+      ["attached garage", "garage"],
       ["private courtyard", "outdoor"],
     ],
     negotiable: "27 days on market — sellers probably flexible.",
