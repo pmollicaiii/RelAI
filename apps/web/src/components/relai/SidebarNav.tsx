@@ -35,6 +35,7 @@ export function SidebarNav({ folders, agentName, agentSubtitle }: SidebarNavProp
           width={100}
           height={100}
           unoptimized
+          priority
           className="brand-logo-img"
           style={{ width: 100, height: 100 }}
         />
