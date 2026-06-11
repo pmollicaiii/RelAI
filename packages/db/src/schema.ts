@@ -548,13 +548,12 @@ export const listingEmbeddings = pgTable(
     generatedAt: timestamp("generated_at", { withTimezone: true }).defaultNow().notNull(),
   },
   (t) => ({
-    uniqueIdentity: unique("listing_embeddings_identity_unique").on(
-      t.listingId,
-      t.kind,
-      t.model,
-      t.recipeVersion,
-      t.photoSequence,
-    ),
+    // NULLS NOT DISTINCT: photo_sequence is NULL for description/essence rows;
+    // without it Postgres treats every NULL as distinct and ON CONFLICT
+    // upserts never match (silent duplicate rows instead of updates).
+    uniqueIdentity: unique("listing_embeddings_identity_unique")
+      .on(t.listingId, t.kind, t.model, t.recipeVersion, t.photoSequence)
+      .nullsNotDistinct(),
     listingKindIdx: index("listing_embeddings_listing_kind_idx").on(t.listingId, t.kind),
     // HNSW indexes added via raw SQL in migration (Drizzle types don't yet support hnsw operator-class
     // syntax cleanly; see migrations/0001_hnsw_indexes.sql in this package).

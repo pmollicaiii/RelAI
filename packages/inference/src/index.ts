@@ -40,6 +40,7 @@ import type {
   InferenceTask,
   TaskRouting,
 } from "./types";
+import { openaiEmbed } from "./vendors/openai";
 
 export * from "./types";
 export { ROUTER, pickVariant } from "./router";
@@ -135,23 +136,16 @@ export async function infer<T extends InferenceResult = InferenceResult>(
 
   const startedAt = Date.now();
   let result: InferenceResult;
+  let tokensIn = 0;
+  let costUsd = 0;
 
   if (shouldUseMock(routing, ctx)) {
     result = mockHandle(taskForVendor);
   } else {
-    // Real-vendor wiring lands in Week 2-3 of the build plan.
-    // Each task kind will dispatch to a vendor-specific handler in
-    // packages/inference/src/vendors/*. Until then, mock mode covers
-    // every call path so the app boots + tests pass end-to-end.
-    result = await retryWithBackoff(
-      async () => {
-        throw new Error(
-          `[@relai/inference] Real vendor calls not yet wired for ${task.kind}. ` +
-            `Set INFERENCE_MODE=mock to develop locally, or implement the ${modelUsed} handler in packages/inference/src/vendors/.`,
-        );
-      },
-      { maxAttempts: 1 },
-    );
+    const real = await retryWithBackoff(() => realHandle(taskForVendor, modelUsed));
+    result = real.result;
+    tokensIn = real.tokensIn;
+    costUsd = real.costUsd;
   }
 
   const latencyMs = Date.now() - startedAt;
@@ -172,13 +166,47 @@ export async function infer<T extends InferenceResult = InferenceResult>(
       modelUsed,
       modelVariant: variant,
       cacheHit: false,
-      tokensIn: 0,
+      tokensIn,
       tokensOut: 0,
-      costUsd: 0,
+      costUsd,
       latencyMs,
       promptHash,
     },
   };
+}
+
+/**
+ * Real-vendor dispatch. Wired task kinds call their vendor handler in
+ * `vendors/`; everything else throws with a pointer to mock mode. Each
+ * milestone wires its own kinds (embeddings → Week 2, extraction chat →
+ * Week 4, packets → Week 6).
+ */
+async function realHandle(
+  task: InferenceTask,
+  modelUsed: string,
+): Promise<{ result: InferenceResult; tokensIn: number; costUsd: number }> {
+  switch (task.kind) {
+    case "embed_listing_description":
+    case "embed_listing_essence":
+    case "embed_soft_pref_statement":
+    case "embed_search_query": {
+      const { vectors, tokensIn, costUsd } = await openaiEmbed([task.text], modelUsed);
+      const vector = vectors[0];
+      if (!vector) {
+        throw new Error(`[@relai/inference] OpenAI returned no embedding for ${task.kind}`);
+      }
+      return {
+        result: { kind: "embedding", vector, model: modelUsed },
+        tokensIn,
+        costUsd,
+      };
+    }
+    default:
+      throw new Error(
+        `[@relai/inference] Real vendor calls not yet wired for ${task.kind}. ` +
+          `Set INFERENCE_MODE=mock to develop locally, or implement the ${modelUsed} handler in packages/inference/src/vendors/.`,
+      );
+  }
 }
 
 /**

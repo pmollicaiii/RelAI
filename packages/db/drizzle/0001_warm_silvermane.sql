@@ -1,0 +1,2 @@
+ALTER TABLE "listing_embeddings" DROP CONSTRAINT "listing_embeddings_identity_unique";--> statement-breakpoint
+ALTER TABLE "listing_embeddings" ADD CONSTRAINT "listing_embeddings_identity_unique" UNIQUE NULLS NOT DISTINCT("listing_id","kind","model","recipe_version","photo_sequence");

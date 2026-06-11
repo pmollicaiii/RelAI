@@ -278,7 +278,13 @@ After ingest, two embedding scopes coexist in the DB (description + essence). Pe
 - Apply: `pnpm --filter @relai/db db:migrate`
 - Drizzle Studio: `pnpm --filter @relai/db db:studio`
 
-**Admin actions** (require Clerk JWT with `publicMetadata.role === "admin"`):
+**Data pipeline** (Pillar 1):
+- Lease-corpus ingest (CSV → Neon, idempotent): `pnpm --filter @relai/db ingest:lease`
+- Embed backfill (hash-gated, idempotent, needs `OPENAI_API_KEY` in `apps/web/.env.local`):
+  `pnpm --filter @relai/web embed:backfill` — flags: `-- --dry-run`, `-- --limit=N`, `-- --concurrency=N` (default 12).
+  Shares its write path with the Inngest `listing-embed` function (`apps/web/src/server/embeddings.ts`), so script + event-driven re-embeds can never drift.
+
+**Admin actions** (PLANNED — endpoints not built yet; require Clerk JWT with `publicMetadata.role === "admin"`):
 - Trigger MLS resync: `POST /api/admin/listings/sync`
 - Embedding backfill: `POST /api/admin/embeddings/backfill` with `{reason: 'missing' | 'recipe-mismatch' | 'all'}`
 - Ontology inbox: `GET /api/admin/ontology/pending` + `POST /api/admin/ontology/pending/:id/{approve,reject,merge}`
@@ -345,6 +351,8 @@ These pairs/triples drift quietly. Update them together in the same PR.
 - **`design.css` font families are next/font CSS variables**, not literal names: `var(--font-sans-inter)` / `var(--font-serif-instrument)` / `var(--font-mono-jetbrains)` (registered in `layout.tsx`). A new design handoff re-concat must re-apply that replacement (`'Inter',` → `var(--font-sans-inter),` etc.) or fonts silently fall back.
 - **Mood tables in `design.css` mirror the prototype's `applyTweaks()` EXACTLY** — only the variables that function sets are overridden per mood. Do NOT "complete" them with extras like `--accent-ink` / `--accent-soft-2`; those intentionally keep their editorial base values in every mood (aurora "why" highlights = blue wash + warm ink text). Shipped defaults from V1 `TWEAK_DEFAULTS`: mood `aurora`, `--pace: 0.5` (pace 2), voice `press`, density `regular`. The TweaksPanel itself is a Claude Design authoring artifact and never ships.
 - **Biome suppressions in JSX must sit directly above the flagged attribute** (e.g. the `role=` line inside the attribute list), not above the element — Biome 1.9 anchors `useSemanticElements` diagnostics at the attribute and reports element-level comments as unused suppressions.
+- **`listing_embeddings_identity_unique` is `NULLS NOT DISTINCT`** (migration 0001). `photo_sequence` is NULL on description/essence rows; without the modifier Postgres treats each NULL as distinct, ON CONFLICT never matches, and upserts silently duplicate instead of updating. Any future unique constraint over a nullable column needs the same treatment.
+- **The embed backfill refuses to run without `OPENAI_API_KEY`** (and `infer()` throws in `NODE_ENV=production` when a vendor key is missing). This is deliberate: the dev mock fallback must never write mock vectors into `listing_embeddings` — they'd silently poison every cosine ranking downstream.
 
 ---
 
