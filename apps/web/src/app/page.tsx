@@ -1,25 +1,24 @@
-import { SearchInitiation } from "@/components/home/SearchInitiation";
-import { AgentHeader } from "@/components/layout/AgentHeader";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { MOCK_FOLDERS } from "@/lib/mock-data";
+import { HomeView } from "@/components/relai/HomeView";
+import { SidebarNav } from "@/components/relai/SidebarNav";
+import { FOLDERS, PULSE } from "@/lib/relai-data";
 import { ensureAgent } from "@/server/agents";
 
 export default async function HomePage() {
   // Auth is enforced by middleware; ensureAgent() guarantees the signed-in
   // user has an agents row even if the Clerk webhook hasn't delivered yet.
-  await ensureAgent();
+  const agent = await ensureAgent();
+  const agentName = agent?.name ?? "Agent";
+  const firstName = agentName.split(" ")[0] ?? "there";
 
-  // TODO Week 2: replace MOCK_FOLDERS with Drizzle query against the
-  // authenticated agent's folders.
+  // TODO Week 2: replace FOLDERS/PULSE with Drizzle queries scoped to the agent.
   return (
-    <div className="flex flex-1 min-h-0">
-      <Sidebar folders={MOCK_FOLDERS} />
-      <div className="flex-1 flex flex-col aurora-wash">
-        <AgentHeader />
-        <main className="flex-1 flex items-center justify-center px-8 py-12">
-          <SearchInitiation folders={MOCK_FOLDERS} />
-        </main>
-      </div>
+    <div className="app">
+      <SidebarNav
+        folders={FOLDERS}
+        agentName={agentName}
+        agentSubtitle={agent?.email ?? undefined}
+      />
+      <HomeView folders={FOLDERS} pulse={PULSE} agentFirstName={firstName} />
     </div>
   );
 }

@@ -1,31 +1,56 @@
 import { notFound } from "next/navigation";
 
-import { FolderTabs } from "@/components/folder/FolderTabs";
-import { AgentHeader } from "@/components/layout/AgentHeader";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { MOCK_FOLDERS } from "@/lib/mock-data";
+import { FolderView } from "@/components/relai/FolderView";
+import { SidebarNav } from "@/components/relai/SidebarNav";
+import {
+  ACTIVE_CHIPS,
+  AMBIGUITY,
+  ARTIFACTS,
+  CHIP_CATEGORIES,
+  CHIP_LIBRARY,
+  EXTRACTED_CRITERIA,
+  FOLDERS,
+  LISTINGS,
+  PREFERENCE_LEDGER,
+  PROFILE_EVENTS,
+  getFolder,
+} from "@/lib/relai-data";
+import { ensureAgent } from "@/server/agents";
 
 interface FolderPageProps {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ surface?: string }>;
 }
 
-export default async function FolderPage({ params, searchParams }: FolderPageProps) {
+export default async function FolderPage({ params }: FolderPageProps) {
   const { id } = await params;
-  const sp = await searchParams;
-  // TODO Week 1: replace mock with Drizzle query.
-  const folder = MOCK_FOLDERS.find((f) => f.id === id);
+  const agent = await ensureAgent();
+  const agentName = agent?.name ?? "Agent";
+
+  // TODO Week 2: replace with Drizzle query scoped to the agent.
+  const folder = getFolder(id);
   if (!folder) notFound();
 
-  const surface = sp.surface === "outreach" || sp.surface === "profile" ? sp.surface : "search";
-
   return (
-    <div className="flex flex-1 min-h-0">
-      <Sidebar folders={MOCK_FOLDERS} />
-      <div className="flex-1 flex flex-col">
-        <AgentHeader />
-        <FolderTabs folder={folder} initialSurface={surface} />
-      </div>
+    <div className="app">
+      <SidebarNav
+        folders={FOLDERS}
+        agentName={agentName}
+        agentSubtitle={agent?.email ?? undefined}
+      />
+      <FolderView
+        folder={folder}
+        data={{
+          listings: LISTINGS,
+          ambiguity: AMBIGUITY,
+          extractedCriteria: EXTRACTED_CRITERIA,
+          preferenceLedger: PREFERENCE_LEDGER,
+          chipLibrary: CHIP_LIBRARY,
+          activeChips: ACTIVE_CHIPS,
+          chipCategories: CHIP_CATEGORIES,
+          artifacts: ARTIFACTS,
+          profileEvents: PROFILE_EVENTS,
+        }}
+      />
     </div>
   );
 }
